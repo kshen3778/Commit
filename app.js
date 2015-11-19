@@ -7,8 +7,6 @@ var bodyParser = require('body-parser');
 
 var passport = require('passport');
 
-// Any database account: user: siteUserAdmin, pass: password
-//db database account: user: dbUserAdmin, pass: password
 var mongoose = require("mongoose");
 var uristring =
     process.env.MONGOLAB_URI ||
