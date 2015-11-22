@@ -61,7 +61,7 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
     //browse/list all tasks
     o.browse = function(){
       return $http.get('/browse/tasks').success(function(data){
-        o.tasks.push(data);
+        angular.copy(data, o.tasks);
       });
     };
     
@@ -186,6 +186,15 @@ app.controller('MainCtrl', [
     }
 ]);
 
+//controls task search and browse
+app.controller('BrowseCtrl', [
+  '$scope',
+  'tasks',
+  function($scope, tasks){
+    $scope.tasks = tasks.tasks;
+  }
+]);
+
 //controller for navbar
 app.controller('NavCtrl', [
 '$scope',
@@ -302,6 +311,17 @@ function($stateProvider, $urlRouterProvider){
     resolve: {
       tasksPromise: ['tasks', function(tasks){
         return tasks.getAll();
+      }]
+    }
+  });
+  
+  $stateProvider.state('browse', {
+    url: '/browse/tasks',
+    templateUrl: 'partials/browse.html',
+    controller: 'BrowseCtrl',
+    resolve: {
+      tasksPromise: ['tasks', function(tasks){
+        return tasks.browse();
       }]
     }
   });
