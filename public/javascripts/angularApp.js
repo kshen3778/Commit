@@ -29,7 +29,7 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
       }).success(function(data){
         angular.copy(data, o.tasks);  
       });
-    }
+    };
     
     
     //create a task
@@ -44,19 +44,26 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
     
     //retrieve a single task
     o.get = function(id){
-      console.log(auth.getToken());
       return $http.get('/tasks/' + id).then(function(res){
         return res.data;
       });
     };
     
+    //delete a task
     o.delete = function(task){
       return $http.delete('/tasks/' + task + '/delete' , {
         headers: {Authorization: 'Bearer ' + auth.getToken()}
       }).success(function(){
 
       });
-    }
+    };
+    
+    //browse/list all tasks
+    o.browse = function(){
+      return $http.get('/browse/tasks').success(function(data){
+        o.tasks.push(data);
+      });
+    };
     
     //edit a task
     o.editTask = function(task, edits){
@@ -153,7 +160,7 @@ app.factory('auth', ['$http', '$window', function($http, $window){
     return auth;
 }]);
 
-//control user and locations
+//control user and tasks
 app.controller('MainCtrl', [
     '$scope',
     'tasks',

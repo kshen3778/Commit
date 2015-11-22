@@ -34,6 +34,15 @@ router.get('/dashboard', auth, function(req,res,next){
     
 });
 
+//browse/search tasks
+router.get('/browse/tasks', function(req,res,next){
+   Task.find(function(err, tasks){
+     if(err){ return next(err); }
+     
+     res.json(tasks);
+   });
+});
+
 router.get('/orgdashboard', auth, function(req,res,next){
     Organization.findOne({email: req.payload.org.email}, function(err, org){
         
