@@ -93,6 +93,7 @@ app.factory('auth', ['$http', '$window', function($http, $window){
     
     //check if user is logged in
     auth.isLoggedIn = function(){
+      console.log("logged in");
       var token = auth.getToken();
       if(token){
         var payload = JSON.parse($window.atob(token.split('.')[1]));
@@ -116,12 +117,20 @@ app.factory('auth', ['$http', '$window', function($http, $window){
       if(auth.isLoggedIn()){
         var token = auth.getToken();
         var payload = JSON.parse($window.atob(token.split('.')[1]));
+        //console.log("Payload type " + payload.type);
         return payload.type;
       }  
     }
     
     auth.isOrganization = function(){
+      console.log(auth.currentType());
       return auth.currentType() === "organization";
+    }
+    
+    auth.isUser = function(){
+      console.log(auth.currentType());
+      return auth.currentType() === "user";
+
     }
     
     //register the user and save token
@@ -213,7 +222,7 @@ app.controller('AuthCtrl', [
 '$state',
 'auth',
 function($scope, $state, auth){
-  $scope.user = {};
+  //$scope.user = {};
   
   //calls auth factory's register method
   $scope.register = function(){
@@ -266,6 +275,8 @@ function($scope, $state, tasks, task, auth){
   $scope.task = task[0];
   $scope.orgname = task[1];
   $scope.isLoggedIn = auth.isLoggedIn;
+  $scope.isOrganization = auth.isOrganization;
+  $scope.isUser = auth.isUser;
   
   $scope.editTask = function(){
         console.log("Task id: " + task[0]._id)

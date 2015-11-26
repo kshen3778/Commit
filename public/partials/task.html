@@ -20,35 +20,38 @@
                         Creator: {{orgname}}
                     </span>
                 </h3>
-                <form ng-submit="editTask()" ng-show="isLoggedIn()" style="margin-top:30px;">
-                    <h3>Edit location</h3>
-                            
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Name" ng-model="name"></input>
+                
+                <div ng-show="isLoggedIn() && isOrganization()">
+                    <form ng-submit="editTask()" ng-show="isLoggedIn()" style="margin-top:30px;">
+                        <h3>Edit location</h3>
+                                
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Name" ng-model="name"></input>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Description" ng-model="description"></input>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="number" class="form-control" placeholder="Hours" ng-model="hours"></input>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Task</button>
+                    </form>
+                    
+                    <br>
+                    
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <form ng-submit="deleteTask()">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Description" ng-model="description"></input>
-                    </div>
-                    
-                    <div class="form-group">
-                        <input type="number" class="form-control" placeholder="Hours" ng-model="hours"></input>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Task</button>
-                </form>
+                </div>
                 
-                <br>
-                
-                <div class="row">
-                    <!--<div class="col-sm-2">
-                        <form ng-submit="saveTask()">
-                            <button type="submit" class="btn btn-success">Save</button>
-                        </form>
-                    </div>-->
-                    <div class="col-sm-2">
-                        <form ng-submit="deleteTask()">
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    </div>
+                <div ng-show="isLoggedIn() && isUser()">
+                    User stuffs
                 </div>
 </div>

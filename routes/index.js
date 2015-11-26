@@ -36,9 +36,9 @@ router.get('/dashboard', auth, function(req,res,next){
 
 //browse/search tasks
 router.get('/browse/tasks', function(req,res,next){
-   Task.find(function(err, tasks){
+   Task.find({},function(err, tasks){
      if(err){ return next(err); }
-     
+     console.log("All Tasks: " + JSON.stringify(tasks));
      res.json(tasks);
    });
 });
@@ -150,6 +150,7 @@ router.get('/tasks/:task', function(req,res,next){
 
 //user registration
 router.post('/register', function(req, res, next){
+    console.log("entering register route");
    if(!req.body.email || !req.body.password){
        return res.status(400).json({message: 'Please fill out all fields'});
    } 
@@ -163,8 +164,6 @@ router.post('/register', function(req, res, next){
        if(err){
            return next(err); 
        }
-       console.log("registration");
-       console.log(user);
        return res.json({token: user.generateJWT()});
    });
 });
@@ -196,7 +195,7 @@ router.post('/registerorg', function(req, res, next){
 //user login
 router.post('/login', function(req,res,next){
    if(!req.body.email || !req.body.password){
-       return res.status(400).json({message: 'Please fill out al required fields'});
+       return res.status(400).json({message: 'Please fill out all required fields'});
    }
    
    passport.authenticate('user-local', function(err, user, info){
