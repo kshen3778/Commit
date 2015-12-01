@@ -1,0 +1,22 @@
+<div class="page-header" ng-show="isLoggedIn()">
+    <h1>Submit Request for Task</h1>
+</div>
+
+<div ng-show="isLoggedIn()">
+    <form ng-submit="editTask()" ng-show="isLoggedIn()" style="margin-top:30px;">
+        <h3>Fill out the following</h3>
+                                
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Name" ng-model="name"></input>
+        </div>
+                        
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Email" ng-model="email"></input>
+        </div>
+                        
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="School" ng-model="school"></input>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>

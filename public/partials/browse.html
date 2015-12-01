@@ -2,7 +2,7 @@
     <h1>Results</h1>
 </div>
             
-<div ng-repeat="task in tasks">
+<div ng-repeat="task in tasks" ng-show="isLoggedIn()">
     <span style="font-size:20px; margin-left:10px">
         <span ng-show="task.name">
             <a href="#/tasks/{{task._id}}">{{task.name}}</a>

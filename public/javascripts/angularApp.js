@@ -1,11 +1,5 @@
 var app = angular.module('test', ['ui.router']);
-//test account:
-//org: lol@gmail.com
-//password: lol123
 
-/*app.run(function(editableOptions) {
-  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
-});*/
 
 app.factory('tasks', ['$http', 'auth', function($http, auth){
     var o = {
@@ -199,8 +193,10 @@ app.controller('MainCtrl', [
 app.controller('BrowseCtrl', [
   '$scope',
   'tasks',
-  function($scope, tasks){
+  'auth',
+  function($scope, tasks, auth){
     $scope.tasks = tasks.tasks;
+    $scope.isLoggedIn = auth.isLoggedIn;
   }
 ]);
 

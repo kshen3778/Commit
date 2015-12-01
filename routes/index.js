@@ -5,7 +5,6 @@ var jwt = require('express-jwt');
 var User = mongoose.model('User');
 var Organization = mongoose.model('Organization');
 var Task = mongoose.model('Task');
-//var Location = mongoose.model('Location');
 
 var router = express.Router();
 
@@ -105,14 +104,10 @@ router.delete('/tasks/:task/delete', auth, function(req, res, next){
                         res.send(err);
                     } else {
                         res.send({});
-                        
-                        //res.render('/orgdashboard');
+
                     }
                 });
             }
-            //res.json({token: org.generateJWT()});
-            //res.json({Authorization: 'Bearer ' + auth});
-            //res.redirect('/orgdashboard', {});
     }); 
 });
 
@@ -145,7 +140,6 @@ router.get('/tasks/:task', function(req,res,next){
       info.push(org.name);
       res.json(info);
    });
-   //res.json(req.task);
 });
 
 //user registration
