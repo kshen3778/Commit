@@ -5,6 +5,7 @@ var jwt = require('express-jwt');
 var User = mongoose.model('User');
 var Organization = mongoose.model('Organization');
 var Task = mongoose.model('Task');
+var TaskRequest = mongoose.model('TaskRequest');
 
 var router = express.Router();
 
@@ -111,9 +112,21 @@ router.delete('/tasks/:task/delete', auth, function(req, res, next){
     }); 
 });
 
+//submit a task request
+router.post('/tasks/:task/submit', auth, function(req, res, next){
+    var tr = new TaskRequest();
+    tr.taskid = req.params.task.id;
+    tr.takername = req.body.name;
+    tr.email = req.body.email;
+    tr.school = req.body.school;
+    tr.organization = req.params.task.organization;
+    
+    res.json(tr);
+});
+
 //preload tasks
 router.param('task', function(req,res,next,id){
-   var query = Task.findById(id); //find the post
+   var query = Task.findById(id); //find the task
    
    // try to get the post details from the Tasks model and attach it to the request object
    query.exec(function(err, task){
