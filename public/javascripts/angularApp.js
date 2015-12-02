@@ -58,7 +58,7 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
         angular.copy(data, o.tasks);
       });
     };
-    
+
     //edit a task
     o.editTask = function(task, edits){
       console.log(task);
@@ -72,6 +72,22 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
     return o;
 }]);
 
+app.factory('taskrequests', ['$http', 'auth', function($http, auth){
+  var r = {
+      requests: []
+  };
+  
+  r.submit = function(){
+    return $http.get('/tasks/' + task + '/submit', {
+      headers: {Authorization: 'Bearer ' + auth.getToken()}
+    }).success(function(){
+        
+    });
+  };
+  
+  return r;
+
+}]);
 app.factory('auth', ['$http', '$window', function($http, $window){
     var auth = {};
     
