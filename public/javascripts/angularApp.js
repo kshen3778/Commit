@@ -77,17 +77,18 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
       requests: []
   };
   
-  r.submit = function(){
+  r.submit = function(task, trequest){
     return $http.get('/tasks/' + task + '/submit', {
       headers: {Authorization: 'Bearer ' + auth.getToken()}
-    }).success(function(){
-        
+    }).success(function(data){
+        r.requests.push(data);
     });
   };
   
   return r;
 
 }]);
+
 app.factory('auth', ['$http', '$window', function($http, $window){
     var auth = {};
     
@@ -291,7 +292,7 @@ function($scope, $state, tasks, task, auth){
   $scope.isUser = auth.isUser;
   
   $scope.editTask = function(){
-        console.log("Task id: " + task[0]._id)
+        console.log("Task id: " + task[0]._id);
         tasks.editTask(task[0]._id, {
           //body: $scope.body
           edits: {
@@ -316,9 +317,34 @@ function($scope, $state, tasks, task, auth){
       $scope.error = error;
     }).then(function(){
       $state.go('orgdashboard');
-    });;
+    });
   };
   
+}]);
+
+app.controller('RequestCtrl', [
+'$scope',
+'$state',
+'requests',
+'request',
+'auth',
+function($scope, $state, requests, request, auth){
+  $scope.request = request;
+  $scope.isLoggedIn = auth.isLoggedIn;
+  $scope.isOrganization = auth.isOrganization;
+  $scope.isUser = auth.isUser;
+  
+  $scope.submit = function(){
+    requests.submit(request._id, {
+      name: $scope.name,
+      email: $scope.email,
+      school: $scope.school
+    });
+    
+    $scope.name = "";
+    $scope.email = "";
+    $scope.school = "";
+  };
 }]);
 
 app.config([
