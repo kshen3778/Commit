@@ -52,6 +52,25 @@
                 </div>
                 
                 <div ng-show="isLoggedIn() && isUser()">
-                    <a class="btn btn-success" href="#/tasks/{{task._id}}/signUp.html">Request Task</a>
+                    <!--<a class="btn btn-success" href="#/tasks/{{task._id}}/signUp.html">Request Task</a>-->
+                    <h1>Request Task</h1>
+                    <div>
+                        <form ng-submit="submitRequest()" style="margin-top:30px;">
+                            <h3>Fill out the following</h3>
+                                                    
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Name" ng-model="name"></input>
+                            </div>
+                                            
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Email" ng-model="email"></input>
+                            </div>
+                                            
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="School" ng-model="school"></input>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
                 </div>
 </div>
