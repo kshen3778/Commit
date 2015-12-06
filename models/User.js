@@ -7,6 +7,7 @@ var UserSchema = new mongoose.Schema({
     hash: String,
     salt: String,
     tasks: [{type: mongoose.Schema.Types.ObjectId, ref: 'Task'}],
+    taskrequests: [{type: mongoose.Schema.Types.ObjectId, ref: 'TaskRequest'}],
     type: String
 });
 

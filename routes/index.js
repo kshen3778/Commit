@@ -121,7 +121,17 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
     tr.school = req.body.school;
     tr.organization = req.params.task.organization;
     
-    res.json(tr);
+    tr.save(function(err, trequest){
+      if(err){ 
+          return next(err); 
+      } 
+      User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
+            if(err){
+                return next(err);
+            }
+            res.json(tr);
+      });
+   });
 });
 
 //preload tasks

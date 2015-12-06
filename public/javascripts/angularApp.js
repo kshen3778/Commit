@@ -184,9 +184,11 @@ app.factory('auth', ['$http', '$window', function($http, $window){
 app.controller('MainCtrl', [
     '$scope',
     'tasks',
+    'requests',
     'auth',
-    function($scope, tasks, auth){
+    function($scope, tasks, requests, auth){
         $scope.tasks = tasks.tasks; //task factory's tasks array
+        $scope.requests = requests.requests;
         $scope.isLoggedIn = auth.isLoggedIn;
         
         //add a new task
@@ -284,9 +286,8 @@ app.controller('TaskCtrl', [
 'tasks',
 'task', //injected via the task state's resolve
 'requests',
-'request',
 'auth',
-function($scope, $state, tasks, task, requests, request, auth){
+function($scope, $state, tasks, task, requests, auth){
   $scope.task = task[0];
   $scope.orgname = task[1];
   $scope.isLoggedIn = auth.isLoggedIn;
@@ -309,8 +310,6 @@ function($scope, $state, tasks, task, requests, request, auth){
           $scope.task.hours = data.hours;
           $state.go('task');
         });
-
-        //$scope.body = '';
 
   };
   
