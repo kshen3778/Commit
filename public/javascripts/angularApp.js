@@ -283,8 +283,10 @@ app.controller('TaskCtrl', [
 '$state',
 'tasks',
 'task', //injected via the task state's resolve
+'requests',
+'request',
 'auth',
-function($scope, $state, tasks, task, auth){
+function($scope, $state, tasks, task, requests, request, auth){
   $scope.task = task[0];
   $scope.orgname = task[1];
   $scope.isLoggedIn = auth.isLoggedIn;
@@ -317,6 +319,14 @@ function($scope, $state, tasks, task, auth){
       $scope.error = error;
     }).then(function(){
       $state.go('orgdashboard');
+    });
+  };
+  
+  $scope.submitRequest = function(){
+    requests.submit(task[0]._id, {
+      name: $scope.name,
+      email: $scope.email,
+      school: $scope.school
     });
   };
   
@@ -374,6 +384,7 @@ function($stateProvider, $urlRouterProvider){
       }]
     }
   });
+  
   
   $stateProvider.state('orgdashboard', {
     url: '/orgdashboard',
