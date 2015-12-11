@@ -78,7 +78,8 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
   };
   
   r.submit = function(task, trequest){
-    return $http.get('/tasks/' + task + '/submit', {
+    console.log("submit taskrequest factory");
+    return $http.post('/tasks/' + task + '/submit', {
       headers: {Authorization: 'Bearer ' + auth.getToken()}
     }).success(function(data){
         r.requests.push(data);
@@ -104,7 +105,6 @@ app.factory('auth', ['$http', '$window', function($http, $window){
     
     //check if user is logged in
     auth.isLoggedIn = function(){
-      console.log("logged in");
       var token = auth.getToken();
       if(token){
         var payload = JSON.parse($window.atob(token.split('.')[1]));
@@ -134,12 +134,10 @@ app.factory('auth', ['$http', '$window', function($http, $window){
     }
     
     auth.isOrganization = function(){
-      console.log(auth.currentType());
       return auth.currentType() === "organization";
     }
     
     auth.isUser = function(){
-      console.log(auth.currentType());
       return auth.currentType() === "user";
 
     }
@@ -184,11 +182,11 @@ app.factory('auth', ['$http', '$window', function($http, $window){
 app.controller('MainCtrl', [
     '$scope',
     'tasks',
-    'requests',
+    'taskrequests',
     'auth',
-    function($scope, tasks, requests, auth){
+    function($scope, tasks, taskrequests, auth){
         $scope.tasks = tasks.tasks; //task factory's tasks array
-        $scope.requests = requests.requests;
+        $scope.requests = taskrequests.requests;
         $scope.isLoggedIn = auth.isLoggedIn;
         
         //add a new task
@@ -285,9 +283,9 @@ app.controller('TaskCtrl', [
 '$state',
 'tasks',
 'task', //injected via the task state's resolve
-'requests',
+'taskrequests',
 'auth',
-function($scope, $state, tasks, task, requests, auth){
+function($scope, $state, tasks, task, taskrequests, auth){
   $scope.task = task[0];
   $scope.orgname = task[1];
   $scope.isLoggedIn = auth.isLoggedIn;
@@ -322,7 +320,8 @@ function($scope, $state, tasks, task, requests, auth){
   };
   
   $scope.submitRequest = function(){
-    requests.submit(task[0]._id, {
+    console.log("submitRequest taskctrl");
+    taskrequests.submit(task[0]._id, {
       name: $scope.name,
       email: $scope.email,
       school: $scope.school

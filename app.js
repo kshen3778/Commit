@@ -23,6 +23,7 @@ mongoose.connect("mongodb://kshen3778-commit-2157685:27017/db");
 require('./models/Task');
 require('./models/User');
 require('./models/Organization');
+require('./models/TaskRequest');
 require('./config/passport');
 var routes = require('./routes/index');
 var users = require('./routes/users');
