@@ -13,9 +13,7 @@ var auth = jwt({secret: 'SECRET', userProperty: 'payload'});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  //console.log(req.payload);
   res.render('index', { title: 'Express' });
-  //res.redirect("/orgdashboard");
 });
 
 //user's dashboard
@@ -33,6 +31,22 @@ router.get('/dashboard', auth, function(req,res,next){
         });
     
 });
+
+//get all task requests
+router.get('/gettaskrequests', auth, function(req,res,next){
+    User.findOne({email: req.payload.user.email}, function(err, user){
+       if(err){
+           return err;
+       } 
+       
+       user.populate('taskrequests', function(err, taskrequests){
+          if(err){
+              return next(err);
+          } 
+          res.json(taskrequests);
+       });
+    });
+})
 
 //browse/search tasks
 router.get('/browse/tasks', function(req,res,next){
@@ -78,7 +92,7 @@ router.post('/tasks', auth, function(req, res, next){
    
 });
 
-//edit specific location
+//edit specific task
 router.put('/tasks/:task/edit', auth, function(req,res,next){
    console.log("Request edit data: " + JSON.stringify(req.body));
    req.task.edit(req.body.edits, function(err, task){
@@ -129,6 +143,8 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
             if(err){
                 return next(err);
             }
+            
+            //console.log("User: " + JSON.stringify(user));
             res.json(tr);
       });
    });

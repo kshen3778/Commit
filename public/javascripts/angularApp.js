@@ -78,12 +78,20 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
   };
   
   r.submit = function(task, trequest){
-    console.log("submit taskrequest factory");
     return $http.post('/tasks/' + task + '/submit', trequest, {
       headers: {Authorization: 'Bearer ' + auth.getToken()}
     }).success(function(data){
         r.requests.push(data);
     });
+  };
+  
+  r.getAll = function(){
+      return $http.get('/gettaskrequests', {
+        //pass JWT token
+        headers: {Authorization: 'Bearer ' + auth.getToken()}
+      }).success(function(data){
+        angular.copy(data, r.requests);   
+      });
   };
   
   return r;
@@ -186,8 +194,9 @@ app.controller('MainCtrl', [
     'auth',
     function($scope, tasks, taskrequests, auth){
         $scope.tasks = tasks.tasks; //task factory's tasks array
-        $scope.requests = taskrequests.requests;
+        $scope.taskrequests = taskrequests.requests;
         $scope.isLoggedIn = auth.isLoggedIn;
+        console.log("TaskRequest Factory: " + JSON.stringify(taskrequests.requests));    
         
         //add a new task
         $scope.addTask = function(){
@@ -320,11 +329,13 @@ function($scope, $state, tasks, task, taskrequests, auth){
   };
   
   $scope.submitRequest = function(){
-    console.log("submitRequest taskctrl");
     taskrequests.submit(task[0]._id, {
       name: $scope.name,
       email: $scope.email,
       school: $scope.school
+    }).then(function(){
+      console.log("TaskRequest Factory: " + JSON.stringify(taskrequests.requests));
+      $state.go('dashboard');
     });
   };
   
@@ -366,9 +377,22 @@ function($stateProvider, $urlRouterProvider){
     templateUrl: 'partials/dashboard.html',
     controller: 'MainCtrl',
     resolve: {
+      /*
       tasksPromise: ['tasks', function(tasks){
         return tasks.getAll();
+      }],
+      
+      
+      taskrequestsPromise: ['taskrequests', function(taskrequests){
+        return taskrequests.getAll();
+      }]*/
+      initialData: ["tasks", "taskrequests","$q", function (tk, tkr, $q) {
+        return $q.all({
+          tasks: tk.getAll(),
+          taskrequests: tkr.getAll()
+        });
       }]
+      
     }
   });
   
