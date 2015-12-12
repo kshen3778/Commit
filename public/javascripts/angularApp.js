@@ -79,7 +79,7 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
   
   r.submit = function(task, trequest){
     console.log("submit taskrequest factory");
-    return $http.post('/tasks/' + task + '/submit', {
+    return $http.post('/tasks/' + task + '/submit', trequest, {
       headers: {Authorization: 'Bearer ' + auth.getToken()}
     }).success(function(data){
         r.requests.push(data);
