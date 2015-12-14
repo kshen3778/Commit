@@ -43,7 +43,8 @@ router.get('/gettaskrequests', auth, function(req,res,next){
           if(err){
               return next(err);
           } 
-          res.json(taskrequests);
+          console.log("taskrequest route: " + JSON.stringify(taskrequests.taskrequests));
+          res.json(taskrequests.taskrequests);
        });
     });
 })

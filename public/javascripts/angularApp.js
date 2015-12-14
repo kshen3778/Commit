@@ -90,6 +90,7 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
         //pass JWT token
         headers: {Authorization: 'Bearer ' + auth.getToken()}
       }).success(function(data){
+        console.log("taskrequest route return: " + JSON.stringify(data));
         angular.copy(data, r.requests);   
       });
   };
@@ -266,8 +267,6 @@ function($scope, $state, auth){
   
   //calls the auth factory's login method
   $scope.logIn = function(){
-    console.log("in AuthCtrl");
-    console.log($scope.user);
     auth.logIn($scope.user).error(function(error){
       $scope.error = error;
     }).then(function(){
@@ -377,7 +376,7 @@ function($stateProvider, $urlRouterProvider){
     templateUrl: 'partials/dashboard.html',
     controller: 'MainCtrl',
     resolve: {
-      /*
+      
       tasksPromise: ['tasks', function(tasks){
         return tasks.getAll();
       }],
@@ -385,13 +384,13 @@ function($stateProvider, $urlRouterProvider){
       
       taskrequestsPromise: ['taskrequests', function(taskrequests){
         return taskrequests.getAll();
-      }]*/
-      initialData: ["tasks", "taskrequests","$q", function (tk, tkr, $q) {
+      }]
+      /*initialData: ["tasks", "taskrequests","$q", function (tk, tkr, $q) {
         return $q.all({
           tasks: tk.getAll(),
           taskrequests: tkr.getAll()
         });
-      }]
+      }]*/
       
     }
   });
