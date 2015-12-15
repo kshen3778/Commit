@@ -129,26 +129,43 @@ router.delete('/tasks/:task/delete', auth, function(req, res, next){
 
 //submit a task request
 router.post('/tasks/:task/submit', auth, function(req, res, next){
-    var tr = new TaskRequest();
-    tr.taskid = req.params.task.id;
-    tr.takername = req.body.name;
-    tr.email = req.body.email;
-    tr.school = req.body.school;
-    tr.organization = req.params.task.organization;
-    
-    tr.save(function(err, trequest){
-      if(err){ 
-          return next(err); 
-      } 
-      User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
-            if(err){
-                return next(err);
-            }
+    Task.findById(req.params.task).exec(function(err, doc) {
+        if (err || !doc) {
+            res.statusCode = 404;
+            res.send({});
+        } else {
+            var tr = new TaskRequest();
+            tr.taskid = req.params.task;
+            tr.taskname = doc.name;
+            tr.takername = req.body.name;
+            tr.email = req.body.email;
+            tr.school = req.body.school;
+            tr.organization = doc.organization;
+            Organization.findById(doc.organization).exec(function(err, orgdoc) {
+                if (err || !orgdoc) {
+                    res.statusCode = 404;
+                    res.send({});
+                }else{
+                    console.log("Organization name: " + orgdoc.name);
+                    tr.orgname = orgdoc.name;
+                }
+            });
             
-            //console.log("User: " + JSON.stringify(user));
-            res.json(tr);
-      });
-   });
+            tr.save(function(err, trequest){
+              if(err){ 
+                  return next(err); 
+              } 
+              User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
+                    if(err){
+                        return next(err);
+                    }
+                    
+                    //console.log("User: " + JSON.stringify(user));
+                    res.json(tr);
+              });
+            });
+        }
+    });
 });
 
 //preload tasks
