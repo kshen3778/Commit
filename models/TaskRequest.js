@@ -4,10 +4,10 @@ var TaskRequestSchema = new mongoose.Schema({
     
     taskid: String,
     taskname: String,
+    orgname: String,
     takername: String,
     email: String,
     school: String,
-    orgname: String,
     organization: {type: mongoose.Schema.Types.ObjectId, ref: 'Organization'}
 });
 

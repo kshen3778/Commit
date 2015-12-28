@@ -43,11 +43,11 @@ router.get('/gettaskrequests', auth, function(req,res,next){
           if(err){
               return next(err);
           } 
-          console.log("taskrequest route: " + JSON.stringify(taskrequests.taskrequests));
+          console.log("taskrequest route: " + taskrequests.taskrequests);
           res.json(taskrequests.taskrequests);
        });
     });
-})
+});
 
 //browse/search tasks
 router.get('/browse/tasks', function(req,res,next){
@@ -127,6 +127,16 @@ router.delete('/tasks/:task/delete', auth, function(req, res, next){
     }); 
 });
 
+function retrieveOrgname(orgid, callback) {
+  Organization.findById(orgid, function(err, org) {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, org.name);
+    }
+  });
+};
+
 //submit a task request
 router.post('/tasks/:task/submit', auth, function(req, res, next){
     Task.findById(req.params.task).exec(function(err, doc) {
@@ -141,31 +151,70 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
             tr.email = req.body.email;
             tr.school = req.body.school;
             tr.organization = doc.organization;
+            /*
             Organization.findById(doc.organization).exec(function(err, orgdoc) {
                 if (err || !orgdoc) {
                     res.statusCode = 404;
                     res.send({});
                 }else{
-                    console.log("Organization name: " + orgdoc.name);
-                    tr.orgname = orgdoc.name;
+                    var odoc = orgdoc.toJSON();
+                    console.log("Organization name: " + odoc.name);
+                    oname = odoc.name;
+                    console.log(oname);
                 }
+            });*/
+            
+            retrieveOrgname(doc.organization, function(err, orgname) {
+                if (err) {
+                    console.log(err);
+                }
+                console.log("orgname is " + orgname);
+                tr.orgname = orgname;
+                console.log("tr " + tr);
+                
+                tr.save(function(err, trequest){
+                    if(err){ 
+                        return next(err); 
+                    } 
+                    User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
+                        if(err){
+                            return next(err);
+                        }
+                    
+                        console.log("trequest: " + JSON.stringify(trequest));
+                        res.json(trequest);
+                    });
+                });
             });
             
-            tr.save(function(err, trequest){
-              if(err){ 
-                  return next(err); 
-              } 
-              User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
-                    if(err){
-                        return next(err);
-                    }
-                    
-                    //console.log("User: " + JSON.stringify(user));
-                    res.json(tr);
-              });
-            });
         }
     });
+    /*
+    var tr = new TaskRequest();
+    tr.taskid = "task id";
+    tr.taskname = "Test name";
+    tr.takername = req.body.name;
+    tr.email = req.body.email;
+    tr.school = req.body.school;
+    //tr.organization = "org id";
+    tr.orgname = "Test organization";
+
+    
+    tr.save(function(err, trequest){
+        if(err){ 
+            console.log("saving error");
+            return next(err); 
+        } 
+        
+        User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
+            if(err){
+                return next(err);
+            }
+                    
+            console.log("trequest: " + JSON.stringify(trequest));
+            res.json(trequest);
+        });
+    });*/
 });
 
 //preload tasks
