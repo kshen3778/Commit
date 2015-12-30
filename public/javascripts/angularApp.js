@@ -95,8 +95,15 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
       });
   };
   
+  //retrieve a single taskrequest
+  r.get = function(id){
+      return $http.get('/taskrequests/' + id).then(function(res){
+        return res.data;
+      });
+  };
+  
   //edit a taskrequest
-  r.editTask = function(taskrequest, edits){
+  r.editTaskRequest = function(taskrequest, edits){
     return $http.put('/taskrequest/' + taskrequest + '/edit', edits, {
       headers: {Authorization: 'Bearer ' + auth.getToken()}
     });
@@ -354,14 +361,13 @@ app.controller('TaskRequestCtrl',[
 'taskrequest',
 'auth',
 function($scope, $state, taskrequests, taskrequest, auth){
-  $scope.taskrequest = taskrequest[0];
-  $scope.orgname = taskrequest[1];
+  $scope.taskrequest = taskrequest;
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.isOrganization = auth.isOrganization;
   $scope.isUser = auth.isUser;
-  
+
   $scope.editTaskRequest = function(){
-        taskrequests.editTaskRequest(taskrequest[0]._id, {
+        taskrequests.editTaskRequest(taskrequest._id, {
           edits: {
             takername: $scope.takername,
             email: $scope.email,
@@ -477,7 +483,7 @@ function($stateProvider, $urlRouterProvider){
     templateUrl: 'partials/taskrequest.html',
     controller: 'TaskRequestCtrl',
     resolve: {
-      //injected into TaskCtrl
+      //injected into TaskRequestCtrl
       taskrequest: ['$stateParams', 'taskrequests', function($stateParams, taskrequests){
         return taskrequests.get($stateParams.id);
       }]

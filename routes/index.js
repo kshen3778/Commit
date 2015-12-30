@@ -127,6 +127,9 @@ router.delete('/tasks/:task/delete', auth, function(req, res, next){
 
 //edit a task request
 router.put('/taskrequests/:taskrequest/edit', auth, function(req,res,next){
+    console.log("in");
+    console.log(req.body.edits);
+    console.log(req.taskrequest);
    req.taskrequest.edit(req.body.edits, function(err, taskrequest){
      if(err){
          return next(err);
@@ -198,7 +201,7 @@ router.param('task', function(req,res,next,id){
 });
 
 //preload taskrequests
-router.param('taskrequests', function(req,res,next,id){
+router.param('taskrequest', function(req,res,next,id){
     var query = TaskRequest.findById(id); //find the task
    
    // try to get the post details from the Tasks model and attach it to the request object
@@ -218,15 +221,13 @@ router.param('taskrequests', function(req,res,next,id){
 
 //retrieve a specific taskrequest
 router.get('/taskrequests/:taskrequest', function(req, res, next){
-   var info = new Array();
-   Organization.findById(req.taskrequest.organization, function (err, org) {
-      if(err){
-          return next(err);
-      }
-      info.push(req.task);
-      info.push(org.name);
-      res.json(info);
-   });
+    console.log("tr get route");
+    TaskRequest.findById(req.taskrequest, function(err, tr){
+        if(err){
+            return next(err);
+        }
+        res.json(tr);
+    });
 });
 
 //retrieve a specific task
