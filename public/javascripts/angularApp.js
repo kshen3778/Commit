@@ -347,7 +347,7 @@ function($scope, $state, tasks, task, taskrequests, auth){
   
 }]);
 
-app.controller('TaskRequestController',[
+app.controller('TaskRequestCtrl',[
 '$scope',
 '$state',
 'taskrequests',
@@ -471,6 +471,18 @@ function($stateProvider, $urlRouterProvider){
     }
   });
 
+  //taskrequest state (single taskrequest)
+  $stateProvider.state('taskrequest', {
+    url: '/taskrequests/{id}',
+    templateUrl: 'partials/taskrequest.html',
+    controller: 'TaskRequestCtrl',
+    resolve: {
+      //injected into TaskCtrl
+      taskrequest: ['$stateParams', 'taskrequests', function($stateParams, taskrequests){
+        return taskrequests.get($stateParams.id);
+      }]
+    }
+  });
   
   //user login state
   $stateProvider.state('login', {

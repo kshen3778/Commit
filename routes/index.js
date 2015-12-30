@@ -216,6 +216,19 @@ router.param('taskrequests', function(req,res,next,id){
     
 });
 
+//retrieve a specific taskrequest
+router.get('/taskrequests/:taskrequest', function(req, res, next){
+   var info = new Array();
+   Organization.findById(req.taskrequest.organization, function (err, org) {
+      if(err){
+          return next(err);
+      }
+      info.push(req.task);
+      info.push(org.name);
+      res.json(info);
+   });
+});
+
 //retrieve a specific task
 router.get('/tasks/:task', function(req,res,next){
    var info = new Array();

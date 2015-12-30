@@ -1,0 +1,47 @@
+<div class="page-header" ng-show="isLoggedIn()">
+                <h3>
+                    <span ng-show="taskrequest.taskname">
+                        Name: {{taskrequest.taskname}}
+                    </span>
+                    <br>
+                    <span ng-show="taskrequest.takename">
+                        Your name: {{taskrequest.takername}}
+                    </span>
+                    <br>
+                    <span ng-show="taskrequest.email">
+                        Your email: {{taskrequest.email}}
+                    </span>
+                    <br>
+                    <span ng-show="taskrequest.school">
+                        Your school: {{taskrequest.school}}
+                    </span>
+                    <br>
+                    <span ng-show="taskrequest.organization">
+                        Creator: {{taskrequest.orgname}}
+                    </span>
+                </h3>    
+                
+                <div ng-show="isLoggedIn() && isUser()">
+                    <form ng-submit="editTaskRequest()" ng-show="isLoggedIn()" style="margin-top:30px;">
+                        <h3>Edit Task</h3>
+                                
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Your Name" ng-model="takername"></input>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Email" ng-model="email"></input>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="School" ng-model="school"></input>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                    
+                    <br>
+
+                    
+                </div>
+
+</div>
