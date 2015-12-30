@@ -18,6 +18,7 @@ TaskRequestSchema.methods.edit = function(edits,cb){
         this.takername = edits.takername;
         this.email = edits.email;
         this.school = edits.school;
+        this.save(cb);
 };
 
 mongoose.model('TaskRequest', TaskRequestSchema);

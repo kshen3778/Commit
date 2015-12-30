@@ -127,9 +127,6 @@ router.delete('/tasks/:task/delete', auth, function(req, res, next){
 
 //edit a task request
 router.put('/taskrequests/:taskrequest/edit', auth, function(req,res,next){
-    console.log("in");
-    console.log(req.body.edits);
-    console.log(req.taskrequest);
    req.taskrequest.edit(req.body.edits, function(err, taskrequest){
      if(err){
          return next(err);
@@ -221,7 +218,6 @@ router.param('taskrequest', function(req,res,next,id){
 
 //retrieve a specific taskrequest
 router.get('/taskrequests/:taskrequest', function(req, res, next){
-    console.log("tr get route");
     TaskRequest.findById(req.taskrequest, function(err, tr){
         if(err){
             return next(err);

@@ -104,7 +104,7 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
   
   //edit a taskrequest
   r.editTaskRequest = function(taskrequest, edits){
-    return $http.put('/taskrequest/' + taskrequest + '/edit', edits, {
+    return $http.put('/taskrequests/' + taskrequest + '/edit', edits, {
       headers: {Authorization: 'Bearer ' + auth.getToken()}
     });
   };
