@@ -15,6 +15,9 @@ var TaskRequestSchema = new mongoose.Schema({
 TaskRequestSchema.methods.edit = function(edits,cb){
         
         //Edit a request as long as it hasn't been approved yet
+        this.takername = edits.takername;
+        this.email = edits.email;
+        this.school = edits.school;
 };
 
 mongoose.model('TaskRequest', TaskRequestSchema);

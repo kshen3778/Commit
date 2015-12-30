@@ -12,7 +12,6 @@ var TaskSchema = new mongoose.Schema({
 
 TaskSchema.methods.edit = function(edits,cb){
         
-        console.log(edits);
         
         this.name = edits.name;
     

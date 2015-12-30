@@ -15,10 +15,9 @@
 <h2>Task Requests</h2>
 <div ng-show="isLoggedIn()" ng-repeat="taskrequest in taskrequests">
     <span style="font-size:20px; margin-left:10px">
-        {{taskrequest.taskname}} by {{taskrequest.orgname}}
-        <!--<span ng-show="taskrequest.taskid">
-            <a href="#/taskrequests/{{taskrequest._id}}">{{taskrequest.taskid}} by {{taskrequest.organization.name}}</a>
-        </span>-->
+        <span ng-show="taskrequest.taskid">
+            <a href="#/taskrequests/{{taskrequest._id}}">{{taskrequest.taskname}} by {{taskrequest.orgname}}</a>
+        </span>
                     
     </span>
 </div>

@@ -95,6 +95,13 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
       });
   };
   
+  //edit a taskrequest
+  r.editTask = function(taskrequest, edits){
+    return $http.put('/taskrequest/' + taskrequest + '/edit', edits, {
+      headers: {Authorization: 'Bearer ' + auth.getToken()}
+    });
+  };
+  
   return r;
 
 }]);
@@ -339,6 +346,39 @@ function($scope, $state, tasks, task, taskrequests, auth){
   };
   
 }]);
+
+app.controller('TaskRequestController',[
+'$scope',
+'$state',
+'taskrequests',
+'taskrequest',
+'auth',
+function($scope, $state, taskrequests, taskrequest, auth){
+  $scope.taskrequest = taskrequest[0];
+  $scope.orgname = taskrequest[1];
+  $scope.isLoggedIn = auth.isLoggedIn;
+  $scope.isOrganization = auth.isOrganization;
+  $scope.isUser = auth.isUser;
+  
+  $scope.editTaskRequest = function(){
+        taskrequests.editTaskRequest(taskrequest[0]._id, {
+          edits: {
+            takername: $scope.takername,
+            email: $scope.email,
+            school: $scope.school
+          }
+        }).success(function(data){
+          console.log("Success data: " + JSON.stringify(data));
+          $scope.taskrequest.takername = data.takername;
+          $scope.taskrequest.email = data.email;
+          $scope.taskrequest.school = data.school;
+          $state.go('taskrequest');
+        });
+
+  };
+}]);
+
+
 
 app.controller('RequestCtrl', [
 '$scope',

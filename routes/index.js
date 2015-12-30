@@ -95,12 +95,10 @@ router.post('/tasks', auth, function(req, res, next){
 
 //edit specific task
 router.put('/tasks/:task/edit', auth, function(req,res,next){
-   console.log("Request edit data: " + JSON.stringify(req.body));
    req.task.edit(req.body.edits, function(err, task){
        if(err){
            return next(err);
        }
-       console.log("Return data: " + JSON.stringify(task));
        res.json(task);
    });
    
@@ -127,15 +125,16 @@ router.delete('/tasks/:task/delete', auth, function(req, res, next){
     }); 
 });
 
-function retrieveOrgname(orgid, callback) {
-  Organization.findById(orgid, function(err, org) {
-    if (err) {
-      callback(err, null);
-    } else {
-      callback(null, org.name);
-    }
-  });
-};
+//edit a task request
+router.put('/taskrequests/:taskrequest/edit', auth, function(req,res,next){
+   req.taskrequest.edit(req.body.edits, function(err, taskrequest){
+     if(err){
+         return next(err);
+     }  
+     res.json(taskrequest);
+   });
+});
+
 
 //submit a task request
 router.post('/tasks/:task/submit', auth, function(req, res, next){
@@ -151,70 +150,33 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
             tr.email = req.body.email;
             tr.school = req.body.school;
             tr.organization = doc.organization;
-            /*
+            
             Organization.findById(doc.organization).exec(function(err, orgdoc) {
                 if (err || !orgdoc) {
                     res.statusCode = 404;
                     res.send({});
                 }else{
-                    var odoc = orgdoc.toJSON();
-                    console.log("Organization name: " + odoc.name);
-                    oname = odoc.name;
-                    console.log(oname);
-                }
-            });*/
-            
-            retrieveOrgname(doc.organization, function(err, orgname) {
-                if (err) {
-                    console.log(err);
-                }
-                console.log("orgname is " + orgname);
-                tr.orgname = orgname;
-                console.log("tr " + tr);
-                
-                tr.save(function(err, trequest){
-                    if(err){ 
-                        return next(err); 
-                    } 
-                    User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
-                        if(err){
-                            return next(err);
-                        }
-                    
-                        console.log("trequest: " + JSON.stringify(trequest));
-                        res.json(trequest);
+                    tr.orgname = orgdoc.name;
+                    tr.save(function(err, trequest){
+                        if(err){ 
+                            return next(err); 
+                        } 
+                        User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
+                            if(err){
+                                return next(err);
+                            }
+                        
+                            console.log("trequest: " + JSON.stringify(trequest));
+                            res.json(trequest);
+                        });
                     });
-                });
+                }
             });
             
+
         }
     });
-    /*
-    var tr = new TaskRequest();
-    tr.taskid = "task id";
-    tr.taskname = "Test name";
-    tr.takername = req.body.name;
-    tr.email = req.body.email;
-    tr.school = req.body.school;
-    //tr.organization = "org id";
-    tr.orgname = "Test organization";
 
-    
-    tr.save(function(err, trequest){
-        if(err){ 
-            console.log("saving error");
-            return next(err); 
-        } 
-        
-        User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
-            if(err){
-                return next(err);
-            }
-                    
-            console.log("trequest: " + JSON.stringify(trequest));
-            res.json(trequest);
-        });
-    });*/
 });
 
 //preload tasks
@@ -233,6 +195,25 @@ router.param('task', function(req,res,next,id){
       req.task = task;
       return next();
    });
+});
+
+//preload taskrequests
+router.param('taskrequests', function(req,res,next,id){
+    var query = TaskRequest.findById(id); //find the task
+   
+   // try to get the post details from the Tasks model and attach it to the request object
+   query.exec(function(err, taskrequest){
+      if(err){
+          return next(err);
+      }
+      if(!taskrequest){
+          return next(new Error('Can\'t find task'));
+      }
+      
+      req.taskrequest = taskrequest;
+      return next();
+   });
+    
 });
 
 //retrieve a specific task
