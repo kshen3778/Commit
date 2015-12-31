@@ -135,6 +135,24 @@ router.put('/taskrequests/:taskrequest/edit', auth, function(req,res,next){
    });
 });
 
+//delete a taskrequest
+router.delete('/taskrequests/:taskrequest/delete', auth, function(req,res,next){
+   TaskRequest.findById(req.params.taskrequest).exec(function(err, doc){
+      if(err || !doc){
+          res.statusCode = 404;
+          res.send({});
+      }else{
+          doc.remove(function(err){
+             if(err){
+                 res.statusCode = 403;
+                 res.send(err);
+             }else{
+                 res.send({});
+             } 
+          });
+      }
+   }); 
+});
 
 //submit a task request
 router.post('/tasks/:task/submit', auth, function(req, res, next){

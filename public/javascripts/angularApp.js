@@ -109,6 +109,12 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
     });
   };
   
+  //delete a task
+  r.delete = function(taskrequest){
+      return $http.delete('/taskrequests/' + taskrequest + '/delete' , {
+        headers: {Authorization: 'Bearer ' + auth.getToken()}
+      });
+  };
   return r;
 
 }]);
@@ -381,6 +387,14 @@ function($scope, $state, taskrequests, taskrequest, auth){
           $state.go('taskrequest');
         });
 
+  };
+  
+  $scope.deleteTaskRequest = function(){
+    taskrequests.delete(taskrequest._id).error(function(error){
+      $scope.error = error;
+    }).then(function(){
+      $state.go('dashboard');
+    });
   };
 }]);
 
