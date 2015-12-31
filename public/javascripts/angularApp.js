@@ -319,9 +319,9 @@ function($scope, $state, tasks, task, taskrequests, auth){
         tasks.editTask(task[0]._id, {
           //body: $scope.body
           edits: {
-            name: $scope.name,
-            description: $scope.description,
-            hours: $scope.hours
+            name: $scope.task.name,
+            description: $scope.task.description,
+            hours: $scope.task.hours
           }
         }).success(function(data){
           console.log("Success data: " + JSON.stringify(data));
@@ -369,9 +369,9 @@ function($scope, $state, taskrequests, taskrequest, auth){
   $scope.editTaskRequest = function(){
         taskrequests.editTaskRequest(taskrequest._id, {
           edits: {
-            takername: $scope.takername,
-            email: $scope.email,
-            school: $scope.school
+            takername: $scope.taskrequest.takername,
+            email: $scope.taskrequest.email,
+            school: $scope.taskrequest.school
           }
         }).success(function(data){
           console.log("Success data: " + JSON.stringify(data));

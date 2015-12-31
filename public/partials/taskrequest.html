@@ -23,18 +23,18 @@
                 
                 <div ng-show="isLoggedIn() && isUser()">
                     <form ng-submit="editTaskRequest()" ng-show="isLoggedIn()" style="margin-top:30px;">
-                        <h3>Edit Task</h3>
+                        <h3>Edit Taskrequest</h3>
                                 
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Your Name" ng-model="takername"></input>
+                            <input type="text" class="form-control" placeholder="Name" ng-model="taskrequest.takername"></input>
                         </div>
                         
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Email" ng-model="email"></input>
+                            <input type="text" class="form-control" placeholder="Email" ng-model="taskrequest.email"></input>
                         </div>
                         
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="School" ng-model="school"></input>
+                            <input type="text" class="form-control" placeholder="School" ng-model="taskrequest.school"></input>
                         </div>
                         <button type="submit" class="btn btn-primary">Save</button>
                     </form>
