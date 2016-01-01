@@ -21,7 +21,7 @@ router.get('/dashboard', auth, function(req,res,next){
         User.findOne({email: req.payload.user.email}, function(err, user){
         
             if(err){return err;}
-    
+            
             user.populate('tasks', function(err, tasks){
                 if(err){
                     return next(err);
@@ -39,13 +39,25 @@ router.get('/gettaskrequests', auth, function(req,res,next){
            return err;
        } 
        
-       user.populate('taskrequests', function(err, taskrequests){
+       //one to Many Normalized schema
+       TaskRequest.find({taker: user._id}, function(err, taskrequests){
           if(err){
-              return next(err);
-          } 
-          console.log("taskrequest route: " + taskrequests.taskrequests);
-          res.json(taskrequests.taskrequests);
+              return err;
+          }
+          res.json(taskrequests);
        });
+       /*
+          user.populate('taskrequests', function(err, user){
+              if(err){
+                  return next(err);
+              } 
+              
+              console.log(JSON.stringify(user.taskrequests));
+              res.json(user.taskrequests);
+          });
+          */
+       
+      
     });
 });
 
@@ -53,7 +65,6 @@ router.get('/gettaskrequests', auth, function(req,res,next){
 router.get('/browse/tasks', function(req,res,next){
    Task.find({},function(err, tasks){
      if(err){ return next(err); }
-     console.log("All Tasks: " + JSON.stringify(tasks));
      res.json(tasks);
    });
 });
@@ -99,7 +110,15 @@ router.put('/tasks/:task/edit', auth, function(req,res,next){
        if(err){
            return next(err);
        }
-       res.json(task);
+       //update the corresponding taskrequests
+       TaskRequest.update({taskid: task._id},{$set: {taskname: req.body.edits.name}}, function(err, taskrequest){
+          if(err){
+              return err;
+          }
+          res.json(task);
+          
+       });
+      
    });
    
    
@@ -168,30 +187,36 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
             tr.email = req.body.email;
             tr.school = req.body.school;
             tr.organization = doc.organization;
-            
-            Organization.findById(doc.organization).exec(function(err, orgdoc) {
-                if (err || !orgdoc) {
-                    res.statusCode = 404;
-                    res.send({});
-                }else{
-                    tr.orgname = orgdoc.name;
-                    tr.save(function(err, trequest){
-                        if(err){ 
-                            return next(err); 
-                        } 
-                        User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
-                            if(err){
-                                return next(err);
-                            }
-                        
-                            console.log("trequest: " + JSON.stringify(trequest));
-                            res.json(trequest);
-                        });
-                    });
+            User.findOne({email: req.payload.email}, function(err, user){
+                if(err){
+                    return next(err);
                 }
-            });
+                
+                tr.taker = user._id;
+                
+                Organization.findById(doc.organization).exec(function(err, orgdoc) {
+                    if (err || !orgdoc) {
+                        res.statusCode = 404;
+                        res.send({});
+                    }else{
+                        tr.orgname = orgdoc.name;
+                        tr.save(function(err, trequest){
+                            if(err){ 
+                                return next(err); 
+                            } 
+                            User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
+                                if(err){
+                                    return next(err);
+                                }
+        
+                                console.log("trequest: " + JSON.stringify(trequest));
+                                res.json(trequest);
+                            });
+                        });
+                    }
+                });
             
-
+            });
         }
     });
 

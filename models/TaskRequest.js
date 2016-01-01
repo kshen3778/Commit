@@ -6,6 +6,7 @@ var TaskRequestSchema = new mongoose.Schema({
     taskname: String,
     orgname: String,
     takername: String,
+    taker: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     email: String,
     school: String,
     organization: {type: mongoose.Schema.Types.ObjectId, ref: 'Organization'}
