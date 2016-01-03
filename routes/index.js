@@ -187,6 +187,7 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
             tr.email = req.body.email;
             tr.school = req.body.school;
             tr.organization = doc.organization;
+            tr.approved = false;
             User.findOne({email: req.payload.email}, function(err, user){
                 if(err){
                     return next(err);
@@ -220,6 +221,26 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
         }
     });
 
+});
+
+//approve a task request
+router.put('/taskrequests/:taskrequest/approve', auth, function(req,res,next){
+   req.taskrequest.approve(function(err, taskrequest){
+     if(err){
+         return next(err);
+     }  
+     res.json(taskrequest);
+   });
+});
+
+//is taskrequest approved
+router.put('/taskrequests/:taskrequest/approve', auth, function(req,res,next){
+   TaskRequest.findOne({_id: req.params.taskrequest._id}, function(err, taskrequest){
+      if(err){
+          return next(err);
+      } 
+      res.send(taskrequest.approved);
+   });
 });
 
 //preload tasks

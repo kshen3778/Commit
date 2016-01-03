@@ -115,6 +115,19 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
         headers: {Authorization: 'Bearer ' + auth.getToken()}
       });
   };
+  
+  r.isApproved = function(taskrequest){
+    return $http.get('/taskrequests/' + taskrequest + '/approved' , {
+        headers: {Authorization: 'Bearer ' + auth.getToken()}
+    });
+  };
+  
+  r.approve = function(taskrequest){
+    return $http.put('/taskrequests/' + taskrequest + '/approve' , {
+        headers: {Authorization: 'Bearer ' + auth.getToken()}
+    });
+  };
+  
   return r;
 
 }]);
@@ -371,6 +384,7 @@ function($scope, $state, taskrequests, taskrequest, auth){
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.isOrganization = auth.isOrganization;
   $scope.isUser = auth.isUser;
+  $scope.isApproved = taskrequests.isApproved(taskrequest);
 
   $scope.editTaskRequest = function(){
         taskrequests.editTaskRequest(taskrequest._id, {
@@ -396,6 +410,14 @@ function($scope, $state, taskrequests, taskrequest, auth){
       $state.go('dashboard');
     });
   };
+  
+  $scope.approveTaskRequest = function(){
+    taskrequests.approve(taskrequest._id).success(function(data){
+    
+    });  
+    
+  };
+  
 }]);
 
 
