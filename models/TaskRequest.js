@@ -9,6 +9,7 @@ var TaskRequestSchema = new mongoose.Schema({
     taker: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     email: String,
     school: String,
+    approved: Boolean,
     organization: {type: mongoose.Schema.Types.ObjectId, ref: 'Organization'}
 });
 
@@ -21,5 +22,10 @@ TaskRequestSchema.methods.edit = function(edits,cb){
         this.school = edits.school;
         this.save(cb);
 };
+
+TaskRequestSchema.methods.approve = function(cb){
+    this.approved = true;
+    this.save(cb);
+}
 
 mongoose.model('TaskRequest', TaskRequestSchema);
