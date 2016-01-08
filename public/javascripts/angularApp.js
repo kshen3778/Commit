@@ -523,7 +523,6 @@ function($stateProvider, $urlRouterProvider){
     controller: 'AuthCtrl',
     onEnter: ['$state', 'auth', function($state, auth){
       if(auth.isLoggedIn()){
-        console.log("already logged in");
         $state.go('orgdashboard');
       }
     }]
