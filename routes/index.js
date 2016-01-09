@@ -61,6 +61,24 @@ router.get('/gettaskrequests', auth, function(req,res,next){
     });
 });
 
+router.get('/gettaskrequests/org', auth, function(req,res,next){
+    Organization.findOne({email: req.payload.org.email}, function(err, org){
+       if(err){
+           return err;
+       } 
+       
+       //one to Many Normalized schema
+       TaskRequest.find({organization: org._id}, function(err, taskrequests){
+          if(err){
+              return err;
+          }
+          res.json(taskrequests);
+       });
+       
+      
+    });
+});
+
 //browse/search tasks
 router.get('/browse/tasks', function(req,res,next){
    Task.find({},function(err, tasks){
@@ -234,7 +252,7 @@ router.put('/taskrequests/:taskrequest/approve', auth, function(req,res,next){
 });
 
 //is taskrequest approved
-router.put('/taskrequests/:taskrequest/approve', auth, function(req,res,next){
+router.put('/taskrequests/:taskrequest/approved', auth, function(req,res,next){
    TaskRequest.findOne({_id: req.params.taskrequest._id}, function(err, taskrequest){
       if(err){
           return next(err);

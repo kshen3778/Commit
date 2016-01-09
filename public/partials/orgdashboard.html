@@ -12,6 +12,15 @@
     </span>
 </div>
 
+<div ng-show="isLoggedIn()" ng-repeat="taskrequest in taskrequests">
+    <span style="font-size:20px; margin-left:10px">
+        <span ng-show="taskrequest.taskname">
+            {{taskrequest.taskname}} from {{taskrequest.takername}}
+        </span>
+                    
+    </span>
+</div>
+
 <form ng-submit="addTask()" ng-show="isLoggedIn()" style="margin-top:30px;">
                 <h3>Add a new Task</h3>
                         

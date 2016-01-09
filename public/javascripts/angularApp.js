@@ -95,6 +95,16 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
       });
   };
   
+  r.getAllOrg = function(){
+    return $http.get('/gettaskrequests/org', {
+        //pass JWT token
+        headers: {Authorization: 'Bearer ' + auth.getToken()}
+    }).success(function(data){
+        console.log("taskrequest org route return: " + JSON.stringify(data));
+        angular.copy(data, r.requests);   
+    });
+  }
+  
   //retrieve a single taskrequest
   r.get = function(id){
       return $http.get('/taskrequests/' + id).then(function(res){
@@ -496,6 +506,9 @@ function($stateProvider, $urlRouterProvider){
     resolve: {
       tasksPromise: ['tasks', function(tasks){
         return tasks.getAllOrg();
+      }],
+      taskrequestsPromise: ['taskrequests', function(taskrequests){
+        return taskrequests.getAllOrg();
       }]
     }
   });
