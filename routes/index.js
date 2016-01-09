@@ -252,11 +252,15 @@ router.put('/taskrequests/:taskrequest/approve', auth, function(req,res,next){
 });
 
 //is taskrequest approved
-router.put('/taskrequests/:taskrequest/approved', auth, function(req,res,next){
-   TaskRequest.findOne({_id: req.params.taskrequest._id}, function(err, taskrequest){
+router.get('/taskrequests/:taskrequest/approved', auth, function(req,res,next){
+   console.log("task request is approved");
+   console.log(req.params.taskrequest);
+   TaskRequest.findOne(req.params.taskrequest._id, function(err, taskrequest){
       if(err){
+          console.log("error");
           return next(err);
       } 
+      console.log("isapproved " + taskrequest);
       res.send(taskrequest.approved);
    });
 });

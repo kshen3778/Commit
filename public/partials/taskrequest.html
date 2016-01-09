@@ -1,23 +1,27 @@
 <div class="page-header" ng-show="isLoggedIn()">
-                <h3>
+                <h3 ng-show="isLoggedIn()">
                     <span ng-show="taskrequest.taskname">
                         Name: {{taskrequest.taskname}}
                     </span>
                     <br>
                     <span ng-show="taskrequest.takername">
-                        Your name: {{taskrequest.takername}}
+                        Taker name: {{taskrequest.takername}}
                     </span>
                     <br>
                     <span ng-show="taskrequest.email">
-                        Your email: {{taskrequest.email}}
+                        Taker email: {{taskrequest.email}}
                     </span>
                     <br>
                     <span ng-show="taskrequest.school">
-                        Your school: {{taskrequest.school}}
+                        Taker school: {{taskrequest.school}}
                     </span>
                     <br>
-                    <span ng-show="taskrequest.organization">
+                    <span ng-show="taskrequest.organization && isUser()">
                         Creator: {{taskrequest.orgname}}
+                    </span>
+                    <br>
+                    <span>
+                        Approved: {{taskrequest.approved}}
                     </span>
                 </h3>    
                 
@@ -39,9 +43,11 @@
                         <button type="submit" class="btn btn-primary">Save</button>
                     </form>
                     
+                </div>
+                    
                     <br>
 
-                    <div class="row">
+                    <div ng-show="isLoggedIn() && isUser()" class="row">
                         <div class="col-sm-2">
                             <form ng-submit="deleteTaskRequest()">
                                 <button type="submit" class="btn btn-danger">Delete</button>
@@ -49,6 +55,14 @@
                         </div>
                     </div>
                     
-                </div>
+                   <div ng-show="isLoggedIn() && isOrganization()" class="row">
+                        <div class="col-sm-2">
+                            <form ng-submit="approve()">
+                                <button type="submit" class="btn btn-primary">Approve</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                
 
 </div>

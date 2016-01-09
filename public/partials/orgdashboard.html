@@ -12,12 +12,12 @@
     </span>
 </div>
 
+<h2>Task Requests</h2>
 <div ng-show="isLoggedIn()" ng-repeat="taskrequest in taskrequests">
     <span style="font-size:20px; margin-left:10px">
         <span ng-show="taskrequest.taskname">
-            {{taskrequest.taskname}} from {{taskrequest.takername}}
+            <a href="#/taskrequests/{{taskrequest._id}}">{{taskrequest.taskname}} from {{taskrequest.takername}}</a>
         </span>
-                    
     </span>
 </div>
 

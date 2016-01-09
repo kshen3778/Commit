@@ -26,6 +26,6 @@ TaskRequestSchema.methods.edit = function(edits,cb){
 TaskRequestSchema.methods.approve = function(cb){
     this.approved = true;
     this.save(cb);
-}
+};
 
 mongoose.model('TaskRequest', TaskRequestSchema);

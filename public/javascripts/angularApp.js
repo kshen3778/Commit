@@ -394,7 +394,7 @@ function($scope, $state, taskrequests, taskrequest, auth){
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.isOrganization = auth.isOrganization;
   $scope.isUser = auth.isUser;
-  $scope.isApproved = taskrequests.isApproved(taskrequest);
+  //$scope.isApproved = taskrequests.isApproved(taskrequest._id);
 
   $scope.editTaskRequest = function(){
         taskrequests.editTaskRequest(taskrequest._id, {
