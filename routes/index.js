@@ -242,11 +242,16 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
 });
 
 //approve a task request
-router.put('/taskrequests/:taskrequest/approve', auth, function(req,res,next){
+router.put('/taskrequests/:taskrequest/approve',  function(req,res,next){
+   console.log(req.params.taskrequest);
+   console.log("approve 2");
    req.taskrequest.approve(function(err, taskrequest){
      if(err){
+         console.log("error approving");
          return next(err);
      }  
+     
+     //console.log("approved " + taskrequest);
      res.json(taskrequest);
    });
 });

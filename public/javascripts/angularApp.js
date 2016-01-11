@@ -133,6 +133,7 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
   };
   
   r.approve = function(taskrequest){
+    console.log("approve " + taskrequest);
     return $http.put('/taskrequests/' + taskrequest + '/approve' , {
         headers: {Authorization: 'Bearer ' + auth.getToken()}
     });
@@ -421,9 +422,10 @@ function($scope, $state, taskrequests, taskrequest, auth){
     });
   };
   
-  $scope.approveTaskRequest = function(){
+  $scope.approve = function(){
     taskrequests.approve(taskrequest._id).success(function(data){
-    
+      $scope.taskrequest.approved = data.approved;
+
     });  
     
   };
