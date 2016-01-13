@@ -241,7 +241,7 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
 
 });
 
-//approve a task request
+//approve a task request (FIX AUTH PROBLEM)
 router.put('/taskrequests/:taskrequest/approve',  function(req,res,next){
    console.log(req.params.taskrequest);
    console.log("approve 2");
