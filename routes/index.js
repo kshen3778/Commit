@@ -6,6 +6,7 @@ var User = mongoose.model('User');
 var Organization = mongoose.model('Organization');
 var Task = mongoose.model('Task');
 var TaskRequest = mongoose.model('TaskRequest');
+var Message = mongoose.model('Message');
 
 var router = express.Router();
 
@@ -372,6 +373,61 @@ router.post('/registerorg', function(req, res, next){
       return res.json({token: org.generateJWT()});
    });
    
+});
+
+//preload user
+router.param('user', function(req,res,next,id){
+    var query = User.findById(id); //find the task
+   
+   // try to get the post details from the Tasks model and attach it to the request object
+   query.exec(function(err, user){
+      if(err){
+          return next(err);
+      }
+      if(!user){
+          return next(new Error('Can\'t find task'));
+      }
+      
+      req.user = user;
+      return next();
+   });
+    
+});
+
+//send notification to user
+router.post('/notify/user/:user', auth, function(req,res,next){
+    var msg = new Message();
+    msg.message = req.body.message;
+    msg.from_id = req.body.from;
+    msg.to_id = req.params.user;
+    
+    msg.save(function(err, msg){
+      if(err){
+          return next(err);
+      }
+      
+      res.json(msg);
+      
+   });
+    
+});
+
+//send notification to user
+router.post('/notify/org/:org', auth, function(req,res,next){
+    var msg = new Message();
+    msg.message = req.body.message;
+    msg.from_id = req.body.from;
+    msg.to_id = req.params.org;
+    
+    msg.save(function(err, msg){
+      if(err){
+          return next(err);
+      }
+      
+      res.json(msg);
+      
+   });
+    
 });
 
 //user login
