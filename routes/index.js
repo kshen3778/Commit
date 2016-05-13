@@ -7,6 +7,7 @@ var Organization = mongoose.model('Organization');
 var Task = mongoose.model('Task');
 var TaskRequest = mongoose.model('TaskRequest');
 var Message = mongoose.model('Message');
+var TaskComponent = mongoose.model('TaskComponent');
 
 var router = express.Router();
 
@@ -82,7 +83,7 @@ router.get('/gettaskrequests/org', auth, function(req,res,next){
 
 //browse/search tasks
 router.get('/browse/tasks', function(req,res,next){
-   Task.find({},function(err, tasks){
+   Task.find({taken: false},function(err, tasks){
      if(err){ return next(err); }
      res.json(tasks);
    });
@@ -108,6 +109,7 @@ router.post('/tasks', auth, function(req, res, next){
 
    var task = new Task(req.body); //create a new post with user input info
    task.organization = req.payload.org;
+   task.taken = false;
    
    task.save(function(err, task){
       if(err){ 
@@ -252,8 +254,15 @@ router.put('/taskrequests/:taskrequest/approve',  function(req,res,next){
          return next(err);
      }  
      
+     Task.findOne(req.taskrequest.taskid, function(err, task){
+        console.log(task);
+        task.setTaken(function(err, takentask){
+            console.log("task is now taken");
+            res.json(taskrequest);
+        }); 
+     });
      //console.log("approved " + taskrequest);
-     res.json(taskrequest);
+     
    });
 });
 
@@ -329,6 +338,25 @@ router.get('/tasks/:task', function(req,res,next){
       info.push(org.name);
       res.json(info);
    });
+});
+
+//add a task component
+router.post('/task/:task/addcomponent', auth, function(req,res,next){
+    var tc = new TaskComponent();
+    tc.task = req.params.task;
+    tc.name = req.body.name;
+    tc.description = req.body.description;
+    tc.requirements = req.body.requirements;
+    tc.hours = req.body.hours;
+    tc.submitted = false;
+    tc.completed = false;
+    
+    tc.save(function(err, taskcomp){
+       if(err){
+           return next(err);
+       } 
+       return res.json(taskcomp);
+    });
 });
 
 //user registration

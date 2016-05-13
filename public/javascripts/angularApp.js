@@ -241,6 +241,8 @@ app.controller('MainCtrl', [
         $scope.tasks = tasks.tasks; //task factory's tasks array
         $scope.taskrequests = taskrequests.requests;
         $scope.isLoggedIn = auth.isLoggedIn;
+        $scope.isApproved = taskrequests.isApproved;
+        //console.log("tr approved " + JSON.stringify(taskrequests.isApproved(taskrequests.requests[0]._id)));
         console.log("TaskRequest Factory: " + JSON.stringify(taskrequests.requests));    
         
         //add a new task

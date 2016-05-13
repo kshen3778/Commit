@@ -24,6 +24,8 @@ require('./models/Task');
 require('./models/User');
 require('./models/Organization');
 require('./models/TaskRequest');
+require('./models/Message');
+require('./models/TaskComponent');
 require('./config/passport');
 var routes = require('./routes/index');
 var users = require('./routes/users');

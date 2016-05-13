@@ -17,6 +17,7 @@
     <span style="font-size:20px; margin-left:10px">
         <span ng-show="taskrequest.taskid">
             <a href="#/taskrequests/{{taskrequest._id}}">{{taskrequest.taskname}} by {{taskrequest.orgname}}</a>
+            <div ng-show="taskrequest.approved == true">[APPROVED]</div>
         </span>
                     
     </span>

@@ -5,8 +5,10 @@ var TaskSchema = new mongoose.Schema({
     name: String,
     description: String,
     hours: Number,
+    components: [{type: mongoose.Schema.Types.ObjectId, ref: 'TaskComponent'}],
     takers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    organization: {type: mongoose.Schema.Types.ObjectId, ref: 'Organization'}
+    organization: {type: mongoose.Schema.Types.ObjectId, ref: 'Organization'},
+    taken: Boolean
 });
 
 
@@ -20,6 +22,15 @@ TaskSchema.methods.edit = function(edits,cb){
     
 
         this.hours = edits.hours;
+    
+    
+        this.save(cb);
+};
+
+TaskSchema.methods.setTaken = function(cb){
+        
+        
+        this.taken = true;
     
     
         this.save(cb);
