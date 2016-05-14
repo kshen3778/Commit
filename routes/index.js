@@ -381,7 +381,7 @@ router.post('/register', function(req, res, next){
 
 //organization registration
 router.post('/registerorg', function(req, res, next){
-   if(!req.body.email || !req.body.password){
+   if(!req.body.email){
        return res.status(400).json({message: 'Please fill out all fields'});
    }
    
@@ -403,7 +403,7 @@ router.post('/registerorg', function(req, res, next){
       if(err){
           return next(err);
       }
-      return res.json({token: org.generateJWT()});
+      return res.json({});
    });
    
 });

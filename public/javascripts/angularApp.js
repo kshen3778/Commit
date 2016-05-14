@@ -307,6 +307,7 @@ function($scope, $state, auth){
     auth.registerOrg($scope.org).error(function(error){
       $scope.error = error;
     }).then(function(){
+      $scope.msg = "An email has been sent. Please check your inbox to complete registration.";
       $state.go('orgdashboard'); //organization dashboard
     });
   };
