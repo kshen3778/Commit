@@ -393,7 +393,12 @@ router.post('/registerorg', function(req, res, next){
    org.city = req.body.city;
    org.country = req.body.country;
    org.type = "organization";
-   org.setPassword(req.body.password);
+   
+   //generate random temp password
+   var randomPass = Math.random().toString(36).slice(-8);
+   
+   org.setPassword(randomPass);
+   
    org.save(function(err){
       if(err){
           return next(err);
