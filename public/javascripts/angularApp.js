@@ -184,16 +184,16 @@ app.factory('auth', ['$http', '$window', function($http, $window){
         //console.log("Payload type " + payload.type);
         return payload.type;
       }  
-    }
+    };
     
     auth.isOrganization = function(){
       return auth.currentType() === "organization";
-    }
+    };
     
     auth.isUser = function(){
       return auth.currentType() === "user";
 
-    }
+    };
     
     //register the user and save token
     auth.register = function(user){
@@ -205,7 +205,7 @@ app.factory('auth', ['$http', '$window', function($http, $window){
     //register the org and save token
     auth.registerOrg = function(org){
       return $http.post('/registerorg', org).success(function(data){
-        auth.saveToken(data.token);
+        //auth.saveToken(data.token);
       });
     };
     

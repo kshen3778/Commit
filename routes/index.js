@@ -9,9 +9,16 @@ var TaskRequest = mongoose.model('TaskRequest');
 var Message = mongoose.model('Message');
 var TaskComponent = mongoose.model('TaskComponent');
 
+var async = require('async');
+var crypto = require('crypto');
+var nodemailer = require('nodemailer');
+
 var router = express.Router();
 
 var auth = jwt({secret: 'SECRET', userProperty: 'payload'});
+
+const emailPass = process.env.PASS;
+const emailUser = process.env.USER;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -403,7 +410,68 @@ router.post('/registerorg', function(req, res, next){
       if(err){
           return next(err);
       }
-      return res.json({});
+      
+      async.waterfall([
+        function(done) {
+          crypto.randomBytes(20, function(err, buf) {
+              console.log("generate token");
+            var token = buf.toString('hex');
+            done(err, token);
+          });
+        },
+        function(token, done) {
+          Organization.findOne({ email: req.body.email }, function(err, org1) {
+            if (!org) {
+              //req.flash('error', 'No account with that email address exists.');
+              return res.redirect('/registerorg');
+            }
+            console.log("organization found");
+            org1.resetPasswordToken = token;
+            org1.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    
+            org1.save(function(err) {
+              console.log("organization saved");
+              done(err, token, org1);
+            });
+          });
+        },
+        function(token, org2, done) {
+          /*var smtpTransport = nodemailer.createTransport('SMTP', {
+            service: 'Gmail',
+            auth: {
+              user: emailUser,
+              pass: emailPass
+            }
+          });*/
+          var smtpTransport = nodemailer.createTransport("smtps://pumpkin3500@gmail.com:"+emailPass+"@smtp.gmail.com");
+          var mailOptions = {
+            to: org2.email,
+            from: 'pumpkin3500@gmail.com',
+            subject: 'Node.js Password Reset',
+            text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+              'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+              'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+              'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+          };
+          smtpTransport.sendMail(mailOptions, function(err) {
+            if(err){
+                console.log("error sending mail: " + JSON.stringify(err));
+            }
+            //req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+            console.log("email sent using " + emailUser + " " + emailPass + " to " + org2.email);
+            //console.log("Message info: " + JSON.stringify(info.response));
+            done(err, 'done');
+          });
+        }
+      ], function(err) {
+        if (err){
+            console.log("error: " + JSON.stringify(err));
+        }
+        console.log("done");
+        return res.json({});
+      });
+      
+      //return res.json({});
    });
    
 });
