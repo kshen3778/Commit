@@ -209,6 +209,12 @@ app.factory('auth', ['$http', '$window', function($http, $window){
       });
     };
     
+    auth.setPass = function(token){
+      return $http.get('/setPass/' + token).success(function(data){
+        
+      });
+    }
+    
     //login user and save the token
     auth.logIn = function(user){
       return $http.post('/login', user).success(function(data){
@@ -289,8 +295,9 @@ function($scope, auth){
 app.controller('AuthCtrl', [
 '$scope',
 '$state',
+'$location',
 'auth',
-function($scope, $state, auth){
+function($scope, $state, $location, auth){
   //$scope.user = {};
   
   //calls auth factory's register method
@@ -327,6 +334,17 @@ function($scope, $state, auth){
       $scope.error = error;
     }).then(function(){
       $state.go('orgdashboard');
+    });
+  };
+  
+  $scope.setPass = function(){
+    var urlParts = $location.absUrl().split('/');
+    var token = urlParts[urlParts.length - 1];
+    auth.setPass(token).error(function(error){
+      $scope.error = error;
+    }).then(function(){
+      $scope.msg = "Your account has been successfully created!";
+      $state.go('loginOrg');
     });
   };
   
@@ -581,6 +599,17 @@ function($stateProvider, $urlRouterProvider){
   
   $stateProvider.state('registerOrg', {
     url: '/registerOrg',
+    templateUrl: 'partials/registerOrg.html',
+    controller: 'AuthCtrl',
+    onEnter: ['$state', 'auth', function($state, auth){
+      if(auth.isLoggedIn()){
+        $state.go('orgdashboard');
+      }
+    }]
+  });
+  
+  $stateProvider.state('createPassword', {
+    url: '/setPass/{:token}',
     templateUrl: 'partials/registerOrg.html',
     controller: 'AuthCtrl',
     onEnter: ['$state', 'auth', function($state, auth){
