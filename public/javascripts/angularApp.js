@@ -210,7 +210,7 @@ app.factory('auth', ['$http', '$window', function($http, $window){
     };
     
     auth.setPass = function(token){
-      return $http.get('/setPass/' + token).success(function(data){
+      return $http.post('/setPass/' + token).success(function(data){
         
       });
     }
@@ -338,6 +338,7 @@ function($scope, $state, $location, auth){
   };
   
   $scope.setPass = function(){
+    console.log("inside setPass angular");
     var urlParts = $location.absUrl().split('/');
     var token = urlParts[urlParts.length - 1];
     auth.setPass(token).error(function(error){
@@ -609,8 +610,8 @@ function($stateProvider, $urlRouterProvider){
   });
   
   $stateProvider.state('createPassword', {
-    url: '/setPass/{:token}',
-    templateUrl: 'partials/registerOrg.html',
+    url: '/createpassword/{token}',
+    templateUrl: 'partials/setPass.html',
     controller: 'AuthCtrl',
     onEnter: ['$state', 'auth', function($state, auth){
       if(auth.isLoggedIn()){

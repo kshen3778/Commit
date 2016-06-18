@@ -450,7 +450,7 @@ router.post('/registerorg', function(req, res, next){
             subject: 'Node.js Password Reset',
             text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
               'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-              'http://' + req.headers.host + '/setPass/' + token + '\n\n' +
+              'http://' + req.headers.host + '/createpassword/' + token + '\n\n' +
               'If you did not request this, please ignore this email and your password will remain unchanged.\n'
           };
           smtpTransport.sendMail(mailOptions, function(err) {
@@ -476,8 +476,26 @@ router.post('/registerorg', function(req, res, next){
    
 });
 
-router.get('/setPass/:token', function(req, res){
+router.post('/setPass/:token', function(req, res){
    //set the organization's password
+   Organization.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, org) {
+        console.log("in setPass/:token");
+        if (!org) {
+          console.log(err);
+          return err;
+        }
+
+        org.setPassword(req.body.password);
+        org.resetPasswordToken = undefined;
+        org.resetPasswordExpires = undefined;
+
+        org.save(function(err) {
+          if(err){
+           return err; 
+          }
+          return res.json({token: org.generateJWT()});
+        });
+     });
 });
 
 //preload user
