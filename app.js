@@ -19,7 +19,7 @@ mongoose.connect(uristring, function (err, res) {
       console.log ('Succeeded connected to: ' + uristring);
       }
 });*/
-mongoose.connect("mongodb://kshen3778-commit-2157685:27017/db");
+mongoose.connect("localhost");
 require('./models/Task');
 require('./models/User');
 require('./models/Organization');
@@ -31,6 +31,8 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+app.set('port', 3000);
 
 app.use(passport.initialize());
 
