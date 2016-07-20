@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var dotenv = require('dotenv');
 var passport = require('passport');
 
 var mongoose = require("mongoose");
@@ -19,7 +19,8 @@ mongoose.connect(uristring, function (err, res) {
       console.log ('Succeeded connected to: ' + uristring);
       }
 });*/
-mongoose.connect("localhost");
+dotenv.load();
+mongoose.connect("localhost/db");
 require('./models/Task');
 require('./models/User');
 require('./models/Organization');
