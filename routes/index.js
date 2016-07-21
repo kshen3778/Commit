@@ -484,18 +484,13 @@ router.get('/createpassword/:token', function(req, res){
 router.post('/setPass/:token', function(req, res){
    //set the organization's password
    Organization.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, org) {
-        console.log("in setPass/:token");
         if (!org) {
-          console.log(err);
+          console.log("Error: " + err);
           return err;
         }
-        console.log(JSON.stringify(org));
-        console.log("before setting org password");
         org.setPassword(req.body.password);
-        console.log("done setting org password");
         org.resetPasswordToken = undefined;
         org.resetPasswordExpires = undefined;
-        console.log("deleting reset token");
 
         org.save(function(err) {
           if(err){

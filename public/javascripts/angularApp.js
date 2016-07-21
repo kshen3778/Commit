@@ -209,8 +209,8 @@ app.factory('auth', ['$http', '$window', function($http, $window){
       });
     };
 
-    auth.setPass = function(token){
-      return $http.post('/setPass/' + token).success(function(data){
+    auth.setPass = function(token, password){
+      return $http.post('/setPass/' + token, {"password": password} ).success(function(data){
 
       });
     }
@@ -338,10 +338,9 @@ function($scope, $state, $location, auth){
   };
 
   $scope.setPass = function(){
-    console.log("inside setPass angular");
     var urlParts = $location.absUrl().split('/');
     var token = urlParts[urlParts.length - 1];
-    auth.setPass(token).error(function(error){
+    auth.setPass(token, $scope.password).error(function(error){
       $scope.error = error;
     }).then(function(){
       $scope.msg = "Your account has been successfully created!";
