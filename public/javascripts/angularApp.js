@@ -176,15 +176,6 @@ app.factory('auth', ['$http', '$window', function($http, $window){
       }
     };
 
-    auth.currentUserObj = function(){
-      if(auth.isLoggedIn()){
-        var token = auth.getToken();
-        var payload = JSON.parse($window.atob(token.split('.')[1]));
-        console.log(payload);
-        return payload;
-      }
-    }
-
     //return type of logged in entity
     auth.currentType = function(){
       if(auth.isLoggedIn()){
@@ -258,6 +249,18 @@ app.factory('account', ['$http', 'auth', function($http, auth){
       });
     };
 
+    account.currentUserObj = function(){
+
+      var email = auth.currentUser();
+      return $http.get('/user/' + email, {
+          headers: {Authorization: 'Bearer ' + auth.getToken()}
+      }).success(function(data){
+          console.log(data);
+          console.log(JSON.stringify(data));
+          return data;
+      });
+    }
+
     return account;
 
 }]);
@@ -330,7 +333,7 @@ function($scope, $state, $location, auth){
     auth.register($scope.user).error(function(error){
       $scope.error = error;
     }).then(function(){
-      $state.go('dashboard');
+      $state.go('profile');
     });
   };
 
@@ -512,22 +515,23 @@ app.controller('ProfileCtrl', [
 'account',
 function($scope, $state, auth, account){
   $scope.isLoggedIn = auth.isLoggedIn;
-  /*auth.currentUserObj().then(function(user){
+  account.currentUserObj().then(function(user){
     console.log(user);
-    $scope.user = user;
-  });*/
+    $scope.user = user.data;
+  });
 
-  $scope.user = auth.currentUserObj();
 
   $scope.editProfile = function(){
     account.editProfile({
       edits: {
+        name: $scope.user.name,
         email: $scope.user.email,
         phone: $scope.user.phone,
         school: $scope.user.school
       }
     }).success(function(data){
       console.log("Success data: " + JSON.stringify(data));
+      $scope.user.name = data.name;
       $scope.user.email = data.email;
       $scope.user.phone = data.phone;
       $scope.user.school = data.school;

@@ -10,7 +10,8 @@ var UserSchema = new mongoose.Schema({
     taskrequests: [{type: mongoose.Schema.Types.ObjectId, ref: 'TaskRequest'}],
     type: String,
     phone: String,
-    school: String
+    school: String,
+    name: String
 });
 
 UserSchema.methods.setPassword = function(password){
@@ -39,14 +40,10 @@ UserSchema.methods.generateJWT = function(){
 };
 
 UserSchema.methods.edit = function(edits, cb){
+  this.name = edits.name;
   this.email = edits.email;
-
-
   this.phone = edits.phone;
-
-
   this.school = edits.school;
-
 
   this.save(cb);
 };

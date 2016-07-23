@@ -614,8 +614,20 @@ router.put('/profile/edit', auth, function(req,res,next){
        });
   });
 
-
-
 });
+
+router.get('/user/:email', auth, function(req, res, next){
+  User.findOne({email: req.params.email}, function(err, user){
+     if(err){
+         console.log("error");
+         return next(err);
+     }
+
+     res.json(user);
+  });
+});
+
+
+
 
 module.exports = router;
