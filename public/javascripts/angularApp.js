@@ -251,8 +251,10 @@ app.factory('account', ['$http', 'auth', function($http, auth){
 
     account.editProfile = function(edits){
       console.log(edits);
-      return $http.put('/profile/edit', edits).success(function(data){
-
+      return $http.put('/profile/edit', edits, {
+          headers: {Authorization: 'Bearer ' + auth.getToken()}
+      }).success(function(data){
+          console.log(data);
       });
     };
 

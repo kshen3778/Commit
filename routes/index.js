@@ -592,6 +592,30 @@ router.post('/loginorg', function(req, res, next){
             return res.status(401).json(info);
         }
     })(req,res,next);
-})
+});
+
+//edit specific task
+router.put('/profile/edit', auth, function(req,res,next){
+  console.log("in put profile/edit");
+  console.log("payload: " + JSON.stringify(req.payload.email));
+  console.log("edits: " + JSON.stringify(req.body.edits));
+
+  User.findOne({email: req.payload.email}, function(err, user){
+
+      if(err){return err;}
+
+      user.edit(req.body.edits, function(err, user2){
+           if(err){
+               console.log("error: " + err);
+               return next(err);
+           }
+
+           res.json(user2);
+       });
+  });
+
+
+
+});
 
 module.exports = router;

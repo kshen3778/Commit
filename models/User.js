@@ -8,7 +8,9 @@ var UserSchema = new mongoose.Schema({
     salt: String,
     tasks: [{type: mongoose.Schema.Types.ObjectId, ref: 'Task'}],
     taskrequests: [{type: mongoose.Schema.Types.ObjectId, ref: 'TaskRequest'}],
-    type: String
+    type: String,
+    phone: String,
+    school: String
 });
 
 UserSchema.methods.setPassword = function(password){
@@ -26,7 +28,7 @@ UserSchema.methods.generateJWT = function(){
   var today = new Date();
   var exp = new Date(today);
   exp.setDate(today.getDate() + 60);
-  
+
   return jwt.sign({
       _id: this._id,
       email: this.email,
@@ -34,6 +36,19 @@ UserSchema.methods.generateJWT = function(){
       user: this, //store the entire user object in the jwt token
       exp: parseInt(exp.getTime() / 1000),
   }, 'SECRET');
+};
+
+UserSchema.methods.edit = function(edits, cb){
+  this.email = edits.email;
+
+
+  this.phone = edits.phone;
+
+
+  this.school = edits.school;
+
+
+  this.save(cb);
 };
 
 mongoose.model('User', UserSchema);
