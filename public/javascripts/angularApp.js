@@ -176,6 +176,15 @@ app.factory('auth', ['$http', '$window', function($http, $window){
       }
     };
 
+    auth.currentUserObj = function(){
+      if(auth.isLoggedIn()){
+        var token = auth.getToken();
+        var payload = JSON.parse($window.atob(token.split('.')[1]));
+        console.log(payload);
+        return payload;
+      }
+    }
+
     //return type of logged in entity
     auth.currentType = function(){
       if(auth.isLoggedIn()){
@@ -235,6 +244,20 @@ app.factory('auth', ['$http', '$window', function($http, $window){
     };
 
     return auth;
+}]);
+
+app.factory('account', ['$http', 'auth', function($http, auth){
+    var account = {};
+
+    account.editProfile = function(edits){
+      console.log(edits);
+      return $http.put('/profile/edit', edits).success(function(data){
+
+      });
+    };
+
+    return account;
+
 }]);
 
 //control user and tasks
@@ -480,6 +503,38 @@ function($scope, $state, requests, request, auth){
   };
 }]);
 
+app.controller('ProfileCtrl', [
+'$scope',
+'$state',
+'auth',
+'account',
+function($scope, $state, auth, account){
+  $scope.isLoggedIn = auth.isLoggedIn;
+  /*auth.currentUserObj().then(function(user){
+    console.log(user);
+    $scope.user = user;
+  });*/
+
+  $scope.user = auth.currentUserObj();
+
+  $scope.editProfile = function(){
+    account.editProfile({
+      edits: {
+        email: $scope.user.email,
+        phone: $scope.user.phone,
+        school: $scope.user.school
+      }
+    }).success(function(data){
+      console.log("Success data: " + JSON.stringify(data));
+      $scope.user.email = data.email;
+      $scope.user.phone = data.phone;
+      $scope.user.school = data.school;
+      //$state.go('profile');
+    });
+  };
+
+}]);
+
 app.config([
 '$stateProvider',
 '$urlRouterProvider',
@@ -617,6 +672,12 @@ function($stateProvider, $urlRouterProvider){
         $state.go('orgdashboard');
       }
     }]
+  });
+
+  $stateProvider.state('profile', {
+    url: '/profile',
+    templateUrl: 'partials/profile.html',
+    controller: 'ProfileCtrl'
   });
 
   $urlRouterProvider.otherwise('home');

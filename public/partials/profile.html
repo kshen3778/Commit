@@ -1,0 +1,40 @@
+<div class="page-header" ng-show="isLoggedIn()">
+    <h1>Profile</h1>
+</div>
+
+<div ng-show="isLoggedIn()">
+
+  <span ng-show="user">
+        User info:
+        <span style="font-size:20px; margin-left:10px">
+            <span ng-show="user.email">
+                <p>Your email: {{user.email}}</p>
+            </span>
+            <span ng-show="user.phone">
+                <p>Your phone: {{user.phone}}</p>
+            </span>
+            <span ng-show="user.school">
+                <p>Your school: {{user.school}}</p>
+            </span>
+
+        </span>
+  </span>
+
+  <!-- Note: might want to replace user with profile -->
+    <form ng-submit="editProfile()" style="margin-top:30px;">
+        <h3>Edit your profile</h3>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Email" ng-model="user.email"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Phone Number" ng-model="user.phone"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="School" ng-model="user.school"></input>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
