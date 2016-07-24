@@ -27,7 +27,7 @@ router.get('/', function(req, res, next) {
 
 //user's dashboard
 router.get('/dashboard', auth, function(req,res,next){
-        User.findOne({email: req.payload.user.email}, function(err, user){
+        User.findOne({_id: req.payload._id}, function(err, user){
 
             if(err){return err;}
 
@@ -43,7 +43,7 @@ router.get('/dashboard', auth, function(req,res,next){
 
 //get all task requests
 router.get('/gettaskrequests', auth, function(req,res,next){
-    User.findOne({email: req.payload.user.email}, function(err, user){
+    User.findOne({_id: req.payload._id}, function(err, user){
        if(err){
            return err;
        }
@@ -211,10 +211,12 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
             var tr = new TaskRequest();
             tr.taskid = req.params.task;
             tr.taskname = doc.name;
-            tr.takername = req.body.name;
-            tr.email = req.body.email;
-            tr.school = req.body.school;
+            //tr.takername = req.body.name;
+            //tr.email = req.body.email;
+            //tr.school = req.body.school;
             tr.organization = doc.organization;
+            //tr.phone = req.body.phone;
+            tr.info = req.body.info;
             tr.approved = false;
             User.findOne({email: req.payload.email}, function(err, user){
                 if(err){
@@ -330,7 +332,18 @@ router.get('/taskrequests/:taskrequest', function(req, res, next){
         if(err){
             return next(err);
         }
-        res.json(tr);
+
+        User.findOne({_id: tr.taker}, function(err, user){
+
+            if(err){return err;}
+            console.log("user: " + JSON.stringify(user));
+            var obj = { taskrequest: tr, applicantdata: user};
+
+            console.log("return data: " + JSON.stringify(obj));
+            res.json(obj);
+        });
+
+
     });
 });
 
@@ -600,7 +613,7 @@ router.put('/profile/edit', auth, function(req,res,next){
   console.log("payload: " + JSON.stringify(req.payload.email));
   console.log("edits: " + JSON.stringify(req.body.edits));
 
-  User.findOne({email: req.payload.email}, function(err, user){
+  User.findOne({_id: req.payload._id}, function(err, user){
 
       if(err){return err;}
 
@@ -616,8 +629,9 @@ router.put('/profile/edit', auth, function(req,res,next){
 
 });
 
-router.get('/user/:email', auth, function(req, res, next){
-  User.findOne({email: req.params.email}, function(err, user){
+//get a specific user using email
+router.get('/user/:id', auth, function(req, res, next){
+  User.findOne({_id: req.params.id}, function(err, user){
      if(err){
          console.log("error");
          return next(err);

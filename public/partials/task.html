@@ -4,9 +4,9 @@
                         Name: {{task.name}}
                     </span>
                     <!--<a ng-show="task.name" href="#" id="editname" data-type="text" data-title="Enter name">{{task.name}}</a>-->
-                    
+
                     <!--<a href="#" editable-text="task.name">{{task.name }}</a>-->
-                    
+
                     <br>
                     <span ng-show="task.description">
                         Description: {{task.description}}
@@ -20,27 +20,27 @@
                         Creator: {{orgname}}
                     </span>
                 </h3>
-                
+
                 <div ng-show="isLoggedIn() && isOrganization()">
                     <form ng-submit="editTask()" ng-show="isLoggedIn()" style="margin-top:30px;">
                         <h3>Edit Task</h3>
-                                
+
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Name" ng-model="task.name"></input>
                         </div>
-                        
+
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Description" ng-model="task.description"></input>
                         </div>
-                        
+
                         <div class="form-group">
                             <input type="number" class="form-control" placeholder="Hours" ng-model="task.hours"></input>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Task</button>
                     </form>
-                    
+
                     <br>
-                    
+
                     <div class="row">
                         <div class="col-sm-2">
                             <form ng-submit="deleteTask()">
@@ -48,26 +48,18 @@
                             </form>
                         </div>
                     </div>
-                    
+
                 </div>
-                
+
                 <div ng-show="isLoggedIn() && isUser()">
                     <!--<a class="btn btn-success" href="#/tasks/{{task._id}}/signUp.html">Request Task</a>-->
                     <h1>Request Task</h1>
                     <div>
                         <form ng-submit="submitRequest()" style="margin-top:30px;">
                             <h3>Fill out the following</h3>
-                                                    
+
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Name" ng-model="name"></input>
-                            </div>
-                                            
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Email" ng-model="email"></input>
-                            </div>
-                                            
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="School" ng-model="school"></input>
+                                <textarea type="text" class="form-control" rows="5"  placeholder="Briefly describe your qualifications" ng-model="info"></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </form>

@@ -108,6 +108,8 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
   //retrieve a single taskrequest
   r.get = function(id){
       return $http.get('/taskrequests/' + id).then(function(res){
+        console.log(JSON.stringify(res));
+        console.log(JSON.stringify(res.data));
         return res.data;
       });
   };
@@ -167,12 +169,12 @@ app.factory('auth', ['$http', '$window', function($http, $window){
       }
     };
 
-    //return email of logged in user or org
+    //return id of logged in user or org
     auth.currentUser = function(){
       if(auth.isLoggedIn()){
         var token = auth.getToken();
         var payload = JSON.parse($window.atob(token.split('.')[1]));
-        return payload.email;
+        return payload._id;
       }
     };
 
@@ -251,13 +253,13 @@ app.factory('account', ['$http', 'auth', function($http, auth){
 
     account.currentUserObj = function(){
 
-      var email = auth.currentUser();
-      return $http.get('/user/' + email, {
+      var id = auth.currentUser();
+      return $http.get('/user/' + id, {
           headers: {Authorization: 'Bearer ' + auth.getToken()}
-      }).success(function(data){
-          console.log(data);
-          console.log(JSON.stringify(data));
-          return data;
+      }).then(function(res){
+          console.log(res);
+          console.log(JSON.stringify(res));
+          return res.data;
       });
     }
 
@@ -386,12 +388,21 @@ app.controller('TaskCtrl', [
 'task', //injected via the task state's resolve
 'taskrequests',
 'auth',
-function($scope, $state, tasks, task, taskrequests, auth){
+'account',
+function($scope, $state, tasks, task, taskrequests, auth, account){
   $scope.task = task[0];
   $scope.orgname = task[1];
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.isOrganization = auth.isOrganization;
   $scope.isUser = auth.isUser;
+
+  account.currentUserObj().then(function(user){
+    console.log(user);
+    $scope.name = user.name;
+    $scope.email = user.email;
+    $scope.school = user.school;
+    $scope.phone = user.phone;
+  });
 
   $scope.editTask = function(){
         console.log("Task id: " + task[0]._id);
@@ -424,7 +435,9 @@ function($scope, $state, tasks, task, taskrequests, auth){
     taskrequests.submit(task[0]._id, {
       name: $scope.name,
       email: $scope.email,
-      school: $scope.school
+      school: $scope.school,
+      phone: $scope.phone,
+      info: $scope.info
     }).then(function(){
       console.log("TaskRequest Factory: " + JSON.stringify(taskrequests.requests));
       $state.go('dashboard');
@@ -447,24 +460,20 @@ function($scope, $state, taskrequests, taskrequest, auth){
   //$scope.isApproved = taskrequests.isApproved(taskrequest._id);
 
   $scope.editTaskRequest = function(){
-        taskrequests.editTaskRequest(taskrequest._id, {
+        taskrequests.editTaskRequest(taskrequest.taskrequest._id, {
           edits: {
-            takername: $scope.taskrequest.takername,
-            email: $scope.taskrequest.email,
-            school: $scope.taskrequest.school
+            info: $scope.taskrequest.taskrequest.info
           }
         }).success(function(data){
           console.log("Success data: " + JSON.stringify(data));
-          $scope.taskrequest.takername = data.takername;
-          $scope.taskrequest.email = data.email;
-          $scope.taskrequest.school = data.school;
+          $scope.taskrequest.taskrequest.info = data.info;
           $state.go('taskrequest');
         });
 
   };
 
   $scope.deleteTaskRequest = function(){
-    taskrequests.delete(taskrequest._id).error(function(error){
+    taskrequests.delete(taskrequest.taskrequest._id).error(function(error){
       $scope.error = error;
     }).then(function(){
       $state.go('dashboard');
@@ -472,8 +481,8 @@ function($scope, $state, taskrequests, taskrequest, auth){
   };
 
   $scope.approve = function(){
-    taskrequests.approve(taskrequest._id).success(function(data){
-      $scope.taskrequest.approved = data.approved;
+    taskrequests.approve(taskrequest.taskrequest._id).success(function(data){
+      $scope.taskrequest.taskrequest.approved = data.approved;
 
     });
 
@@ -517,8 +526,10 @@ function($scope, $state, auth, account){
   $scope.isLoggedIn = auth.isLoggedIn;
   account.currentUserObj().then(function(user){
     console.log(user);
-    $scope.user = user.data;
+    $scope.user = user;
   });
+
+  //$scope.user = account.currentUserObj();
 
 
   $scope.editProfile = function(){
