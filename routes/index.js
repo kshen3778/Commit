@@ -412,6 +412,8 @@ router.post('/registerorg', function(req, res, next){
    org.desc = req.body.desc;
    org.city = req.body.city;
    org.country = req.body.country;
+   org.phone = req.body.phone;
+   org.info = req.body.info;
    org.type = "organization";
 
    //generate random temp password
@@ -607,8 +609,8 @@ router.post('/loginorg', function(req, res, next){
     })(req,res,next);
 });
 
-//edit specific task
-router.put('/profile/edit', auth, function(req,res,next){
+//edit specific user profile
+router.put('/profile/user/edit', auth, function(req,res,next){
   console.log("in put profile/edit");
   console.log("payload: " + JSON.stringify(req.payload.email));
   console.log("edits: " + JSON.stringify(req.body.edits));
@@ -629,7 +631,26 @@ router.put('/profile/edit', auth, function(req,res,next){
 
 });
 
-//get a specific user using email
+//edit org profile
+router.put('/profile/org/edit', auth, function(req,res,next){
+
+  Organization.findOne({_id: req.payload._id}, function(err, org){
+
+      if(err){return err;}
+
+      org.edit(req.body.edits, function(err, org2){
+           if(err){
+               console.log("error: " + err);
+               return next(err);
+           }
+
+           res.json(org2);
+       });
+  });
+
+});
+
+//get a specific user
 router.get('/user/:id', auth, function(req, res, next){
   User.findOne({_id: req.params.id}, function(err, user){
      if(err){
@@ -638,6 +659,18 @@ router.get('/user/:id', auth, function(req, res, next){
      }
 
      res.json(user);
+  });
+});
+
+//get a specific org using email
+router.get('/org/:id', auth, function(req, res, next){
+  Organization.findOne({_id: req.params.id}, function(err, org){
+     if(err){
+         console.log("error");
+         return next(err);
+     }
+
+     res.json(org);
   });
 });
 

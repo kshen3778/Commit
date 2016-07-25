@@ -21,7 +21,7 @@
           <ul class="nav navbar-nav">
             <li ng-show="currentType() === 'organization'"><a href="/#/orgdashboard"> Dashboard </a></li>
             <li ng-show="currentType() === 'user'"><a href="/#/dashboard"> Dashboard </a></li>
-            <li ng-show="currentType() === 'user'"><a href="/#/profile"> Profile </a></li>
+            <li ng-show="isLoggedIn()"><a href="/#/profile"> Profile </a></li>
             <li ng-show="isLoggedIn()"><a href="" ng-click="logOut()">Log Out</a></li>
             <li ng-hide="isLoggedIn()"><a href="/#/login">Log In</a></li>
             <li ng-hide="isLoggedIn()"><a href="/#/register">Register</a></li>

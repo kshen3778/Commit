@@ -244,7 +244,16 @@ app.factory('account', ['$http', 'auth', function($http, auth){
 
     account.editProfile = function(edits){
       console.log(edits);
-      return $http.put('/profile/edit', edits, {
+      return $http.put('/profile/user/edit', edits, {
+          headers: {Authorization: 'Bearer ' + auth.getToken()}
+      }).success(function(data){
+          console.log(data);
+      });
+    };
+
+    account.editOrgProfile = function(edits){
+      console.log(edits);
+      return $http.put('/profile/org/edit', edits, {
           headers: {Authorization: 'Bearer ' + auth.getToken()}
       }).success(function(data){
           console.log(data);
@@ -255,6 +264,18 @@ app.factory('account', ['$http', 'auth', function($http, auth){
 
       var id = auth.currentUser();
       return $http.get('/user/' + id, {
+          headers: {Authorization: 'Bearer ' + auth.getToken()}
+      }).then(function(res){
+          console.log(res);
+          console.log(JSON.stringify(res));
+          return res.data;
+      });
+    }
+
+    account.currentOrgObj = function(){
+
+      var id = auth.currentUser(); //gets the current logged in organization id
+      return $http.get('/org/' + id, {
           headers: {Authorization: 'Bearer ' + auth.getToken()}
       }).then(function(res){
           console.log(res);
@@ -396,13 +417,7 @@ function($scope, $state, tasks, task, taskrequests, auth, account){
   $scope.isOrganization = auth.isOrganization;
   $scope.isUser = auth.isUser;
 
-  account.currentUserObj().then(function(user){
-    console.log(user);
-    $scope.name = user.name;
-    $scope.email = user.email;
-    $scope.school = user.school;
-    $scope.phone = user.phone;
-  });
+
 
   $scope.editTask = function(){
         console.log("Task id: " + task[0]._id);
@@ -524,10 +539,18 @@ app.controller('ProfileCtrl', [
 'account',
 function($scope, $state, auth, account){
   $scope.isLoggedIn = auth.isLoggedIn;
+  $scope.isOrganization = auth.isOrganization;
+  $scope.isUser = auth.isUser;
+
   account.currentUserObj().then(function(user){
     console.log(user);
     $scope.user = user;
   });
+
+  account.currentOrgObj().then(function(org){
+    console.log(org);
+    $scope.org = org;
+  })
 
   //$scope.user = account.currentUserObj();
 
@@ -546,6 +569,28 @@ function($scope, $state, auth, account){
       $scope.user.email = data.email;
       $scope.user.phone = data.phone;
       $scope.user.school = data.school;
+      //$state.go('profile');
+    });
+  };
+
+  $scope.editOrgProfile = function(){
+    account.editOrgProfile({
+      edits: {
+        name: $scope.org.name,
+        email: $scope.org.email,
+        phone: $scope.org.phone,
+        city: $scope.org.city,
+        country: $scope.org.country,
+        info: $scope.org.info
+      }
+    }).success(function(data){
+      console.log("Success data: " + JSON.stringify(data));
+      $scope.org.name = data.name;
+      $scope.org.email = data.email;
+      $scope.org.phone = data.phone;
+      $scope.org.city = data.city;
+      $scope.org.country = data.country;
+      $scope.org.info = data.info;
       //$state.go('profile');
     });
   };
