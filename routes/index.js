@@ -71,7 +71,7 @@ router.get('/gettaskrequests', auth, function(req,res,next){
 });
 
 router.get('/gettaskrequests/org', auth, function(req,res,next){
-    Organization.findOne({email: req.payload.org.email}, function(err, org){
+    Organization.findOne({_id: req.payload._id}, function(err, org){
        if(err){
            return err;
        }
@@ -97,7 +97,7 @@ router.get('/browse/tasks', function(req,res,next){
 });
 
 router.get('/orgdashboard', auth, function(req,res,next){
-    Organization.findOne({email: req.payload.org.email}, function(err, org){
+    Organization.findOne({_id: req.payload._id}, function(err, org){
 
             if(err){return err;}
 
@@ -115,19 +115,33 @@ router.get('/orgdashboard', auth, function(req,res,next){
 router.post('/tasks', auth, function(req, res, next){
 
    var task = new Task(req.body); //create a new post with user input info
+   task.name = req.body.name;
+   task.description = req.body.desc;
+   task.hours = req.body.hours;
    task.organization = req.payload.org;
    task.taken = false;
 
-   task.save(function(err, task){
-      if(err){
-          return next(err);
-      }
-      Organization.update({email: req.payload.email},{$addToSet:{tasks: task}},function(err, org){
-            if(err){
-                return next(err);
-            }
-            res.json(task);
-      });
+   //create taskcomponents
+   TaskComponent.create(req.body.taskcomponents, function(err, tcs){
+     if(err){
+       console.log(err);
+       return err;
+     }
+
+     task.components = tcs;
+
+     task.save(function(err, task){
+        if(err){
+            return next(err);
+        }
+        Organization.update({_id: req.payload._id},{$addToSet:{tasks: task}},function(err, org){
+              if(err){
+                  return next(err);
+              }
+              res.json(task);
+        });
+     });
+
    });
 
 });
@@ -218,7 +232,7 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
             //tr.phone = req.body.phone;
             tr.info = req.body.info;
             tr.approved = false;
-            User.findOne({email: req.payload.email}, function(err, user){
+            User.findOne({_id: req.payload._id}, function(err, user){
                 if(err){
                     return next(err);
                 }
@@ -235,7 +249,7 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
                             if(err){
                                 return next(err);
                             }
-                            User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
+                            User.update({_id: req.payload._id},{$addToSet:{taskrequests: trequest}},function(err, user){
                                 if(err){
                                     return next(err);
                                 }
@@ -360,7 +374,7 @@ router.get('/tasks/:task', function(req,res,next){
    });
 });
 
-//add a task component
+//add a task component (NOT USED)
 router.post('/task/:task/addcomponent', auth, function(req,res,next){
     var tc = new TaskComponent();
     tc.task = req.params.task;

@@ -302,6 +302,24 @@ app.controller('MainCtrl', [
         //console.log("tr approved " + JSON.stringify(taskrequests.isApproved(taskrequests.requests[0]._id)));
         console.log("TaskRequest Factory: " + JSON.stringify(taskrequests.requests));
 
+        $scope.taskcomponents = [];
+
+        $scope.addTaskComponent = function(){
+          var tc = {
+            name: $scope.taskc.name,
+            requirements: $scope.taskc.requirements,
+            due: $scope.taskc.due,
+            esthours: $scope.taskc.esthours
+          };
+
+          $scope.taskcomponents.push(tc);
+
+          $scope.taskc.name = "";
+          $scope.taskc.requirements = "";
+          $scope.taskc.due = "";
+          $scope.taskc.esthours = "";
+        };
+
         //add a new task
         $scope.addTask = function(){
           if(!$scope.name || $scope.name === ""){
@@ -310,7 +328,8 @@ app.controller('MainCtrl', [
           tasks.create({
              name: $scope.name,
              description: $scope.desc,
-             hours: $scope.hours
+             hours: $scope.hours,
+             taskcomponents: $scope.taskcomponents
           });
           $scope.name = "";
           $scope.desc = "";
