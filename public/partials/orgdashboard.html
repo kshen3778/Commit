@@ -40,10 +40,10 @@
 <h2>Add task components</h2>
 
 <div ng-repeat="taskcomponent in taskcomponents">
-    <h3>Name: {{taskcomponent.name}}</h3>
-    <h3>Requirements: {{taskcomponent.requirements}}</h3>
-    <h3>Due: {{taskcomponent.due}}</h3>
-    <h3>Estimated completion time (hours): {{taskcomponent.esthours}}</h3>
+    <h3 ng-show="taskcomponent.name">Name: {{taskcomponent.name}}</h3>
+    <h3 ng-show="taskcomponent.requirements">Requirements: {{taskcomponent.requirements}}</h3>
+    <h3 ng-show="taskcomponent.due">Due: {{taskcomponent.due}}</h3>
+    <h3 ng-show="taskcomponent.esthours">Estimated completion time (hours): {{taskcomponent.esthours}}</h3>
     <h3> __________________________________________________________ </h3>
     <br>
 </div>

@@ -25,6 +25,16 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
       });
     };
 
+    //get a specific task's taskcomponents
+    o.getTaskComponents = function(taskid){
+      return $http.get('/tasks/' + taskid + '/taskcomponents', {
+        //pass JWT token
+        headers: {Authorization: 'Bearer ' + auth.getToken()}
+      }).then(function(res){
+          console.log(JSON.stringify(res.data));
+          return res.data;
+      });
+    }
 
     //create a task
     o.create  = function(task){
@@ -103,7 +113,7 @@ app.factory('taskrequests', ['$http', 'auth', function($http, auth){
         console.log("taskrequest org route return: " + JSON.stringify(data));
         angular.copy(data, r.requests);
     });
-  }
+  };
 
   //retrieve a single taskrequest
   r.get = function(id){
@@ -318,6 +328,7 @@ app.controller('MainCtrl', [
           $scope.taskc.requirements = "";
           $scope.taskc.due = "";
           $scope.taskc.esthours = "";
+          $scope.taskc.taskcomponents = [];
         };
 
         //add a new task
@@ -427,16 +438,23 @@ app.controller('TaskCtrl', [
 'tasks',
 'task', //injected via the task state's resolve
 'taskrequests',
+'taskcomponents',
 'auth',
 'account',
-function($scope, $state, tasks, task, taskrequests, auth, account){
+function($scope, $state, tasks, task, taskrequests, taskcomponents, auth, account){
   $scope.task = task[0];
   $scope.orgname = task[1];
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.isOrganization = auth.isOrganization;
   $scope.isUser = auth.isUser;
 
+  $scope.taskcomponents = taskcomponents;
 
+  for(var i = 0; i < taskcomponents.length; i++){
+    var tcdate = taskcomponents[i].due;
+    var date = new Date(tcdate + "");
+    taskcomponents[i].due = date.toString();
+  }
 
   $scope.editTask = function(){
         console.log("Task id: " + task[0]._id);
@@ -454,6 +472,10 @@ function($scope, $state, tasks, task, taskrequests, auth, account){
           $scope.task.hours = data.hours;
           $state.go('task');
         });
+
+  };
+
+  $scope.editTaskComponent = function(id){
 
   };
 
@@ -681,6 +703,10 @@ function($stateProvider, $urlRouterProvider){
       //injected into TaskCtrl
       task: ['$stateParams', 'tasks', function($stateParams, tasks){
         return tasks.get($stateParams.id);
+      }],
+
+      taskcomponents: ['$stateParams', 'tasks', function($stateParams, tasks){
+        return tasks.getTaskComponents($stateParams.id);
       }]
     }
   });

@@ -114,35 +114,56 @@ router.get('/orgdashboard', auth, function(req,res,next){
 //create a task
 router.post('/tasks', auth, function(req, res, next){
 
-   var task = new Task(req.body); //create a new post with user input info
+   var task = new Task(); //create a new post with user input info
    task.name = req.body.name;
-   task.description = req.body.desc;
+   task.description = req.body.description;
    task.hours = req.body.hours;
    task.organization = req.payload.org;
    task.taken = false;
 
-   //create taskcomponents
-   TaskComponent.create(req.body.taskcomponents, function(err, tcs){
-     if(err){
-       console.log(err);
-       return err;
-     }
 
-     task.components = tcs;
 
-     task.save(function(err, task){
+   task.save(function(err, task){
         if(err){
-            return next(err);
+            console.log("err1: " + JSON.stringify(err));
+            return err;
         }
-        Organization.update({_id: req.payload._id},{$addToSet:{tasks: task}},function(err, org){
-              if(err){
-                  return next(err);
-              }
-              res.json(task);
-        });
-     });
 
-   });
+        var taskcomponentsdata = req.body.taskcomponents;
+        for(var i=0; i<taskcomponentsdata.length; i++){
+          taskcomponentsdata[i].task = task._id;
+        }
+
+        TaskComponent.create(req.body.taskcomponents, function(err, tcs){
+            if(err){
+              console.log("err2: " + JSON.stringify(err));
+              return err;
+            }
+
+            task.components = tcs;
+            task.save(function(err, utask){
+
+              if(err){
+                console.log("err3: " + JSON.stringify(err));
+                return err;
+              }
+
+              Organization.update({_id: req.payload._id},{$addToSet:{tasks: utask}},function(err, org){
+                    if(err){
+                      console.log("err3: " + JSON.stringify(err));
+                        return err;
+                    }
+                    res.json(utask);
+              });
+            });
+
+
+
+
+
+        });
+
+      });
 
 });
 
@@ -321,7 +342,7 @@ router.param('task', function(req,res,next,id){
    });
 });
 
-//preload taskrequests
+//preload taskrequest
 router.param('taskrequest', function(req,res,next,id){
     var query = TaskRequest.findById(id); //find the task
 
@@ -372,6 +393,19 @@ router.get('/tasks/:task', function(req,res,next){
       info.push(org.name);
       res.json(info);
    });
+});
+
+//retrieve taskcomponents of a specific task
+router.get('/tasks/:task/taskcomponents', function(req, res, next){
+
+    TaskComponent.find({task: req.task._id}, function(err, tcs){
+      if(err){
+        return err;
+      }
+
+      res.json(tcs);
+    });
+
 });
 
 //add a task component (NOT USED)
