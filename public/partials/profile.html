@@ -1,0 +1,109 @@
+<div class="page-header" ng-show="isLoggedIn()">
+    <h1>Profile</h1>
+</div>
+
+<div ng-show="isLoggedIn()">
+
+  <div ng-show="isUser()">
+    <span ng-show="user">
+          <h1>User info:</h1>
+          <span style="font-size:20px; margin-left:10px">
+              <span ng-show="user.name">
+                  <p>Your email: {{user.name}}</p>
+              </span>
+              <span ng-show="user.email">
+                  <p>Your email: {{user.email}}</p>
+              </span>
+              <span ng-show="user.phone">
+                  <p>Your phone: {{user.phone}}</p>
+              </span>
+              <span ng-show="user.school">
+                  <p>Your school: {{user.school}}</p>
+              </span>
+
+          </span>
+    </span>
+  </div>
+
+  <div ng-show="isOrganization()">
+    <span ng-show="org">
+          <h1>User info:</h1>
+          <span style="font-size:20px; margin-left:10px">
+              <span ng-show="org.name">
+                  <p>Your name: {{org.name}}</p>
+              </span>
+              <span ng-show="org.city">
+                  <p>Your city: {{org.city}}</p>
+              </span>
+              <span ng-show="org.country">
+                  <p>Your country: {{org.country}}</p>
+              </span>
+              <span ng-show="org.email">
+                  <p>Your email: {{org.email}}</p>
+              </span>
+              <span ng-show="org.phone">
+                  <p>Your phone: {{org.phone}}</p>
+              </span>
+              <span ng-show="org.info">
+                  <p>Your info: {{org.info}}</p>
+              </span>
+
+          </span>
+    </span>
+  </div>
+
+  <div ng-show="isUser()">
+    <form ng-submit="editProfile()" style="margin-top:30px;">
+        <h3>Edit your profile</h3>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Full name" ng-model="user.name"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Email" ng-model="user.email"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Phone Number" ng-model="user.phone"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="School" ng-model="user.school"></input>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+  </div>
+
+  <div ng-show="isOrganization()">
+    <form ng-submit="editOrgProfile()" style="margin-top:30px;">
+        <h3>Edit your profile</h3>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Organization name" ng-model="org.name"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="City" ng-model="org.city"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Country" ng-model="org.country"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Email" ng-model="org.email"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Phone" ng-model="org.phone"></input>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Info" ng-model="org.info"></input>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+  </div>
+</div>

@@ -9,9 +9,16 @@ var TaskRequest = mongoose.model('TaskRequest');
 var Message = mongoose.model('Message');
 var TaskComponent = mongoose.model('TaskComponent');
 
+var async = require('async');
+var crypto = require('crypto');
+var nodemailer = require('nodemailer');
+
 var router = express.Router();
 
 var auth = jwt({secret: 'SECRET', userProperty: 'payload'});
+
+const emailPass = process.env.PASS;
+const emailUser = process.env.USER;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -20,10 +27,10 @@ router.get('/', function(req, res, next) {
 
 //user's dashboard
 router.get('/dashboard', auth, function(req,res,next){
-        User.findOne({email: req.payload.user.email}, function(err, user){
-        
+        User.findOne({_id: req.payload._id}, function(err, user){
+
             if(err){return err;}
-            
+
             user.populate('tasks', function(err, tasks){
                 if(err){
                     return next(err);
@@ -31,16 +38,16 @@ router.get('/dashboard', auth, function(req,res,next){
                 res.json(tasks);
             });
         });
-    
+
 });
 
 //get all task requests
 router.get('/gettaskrequests', auth, function(req,res,next){
-    User.findOne({email: req.payload.user.email}, function(err, user){
+    User.findOne({_id: req.payload._id}, function(err, user){
        if(err){
            return err;
-       } 
-       
+       }
+
        //one to Many Normalized schema
        TaskRequest.find({taker: user._id}, function(err, taskrequests){
           if(err){
@@ -52,23 +59,23 @@ router.get('/gettaskrequests', auth, function(req,res,next){
           user.populate('taskrequests', function(err, user){
               if(err){
                   return next(err);
-              } 
-              
+              }
+
               console.log(JSON.stringify(user.taskrequests));
               res.json(user.taskrequests);
           });
           */
-       
-      
+
+
     });
 });
 
 router.get('/gettaskrequests/org', auth, function(req,res,next){
-    Organization.findOne({email: req.payload.org.email}, function(err, org){
+    Organization.findOne({_id: req.payload._id}, function(err, org){
        if(err){
            return err;
-       } 
-       
+       }
+
        //one to Many Normalized schema
        TaskRequest.find({organization: org._id}, function(err, taskrequests){
           if(err){
@@ -76,8 +83,8 @@ router.get('/gettaskrequests/org', auth, function(req,res,next){
           }
           res.json(taskrequests);
        });
-       
-      
+
+
     });
 });
 
@@ -90,10 +97,10 @@ router.get('/browse/tasks', function(req,res,next){
 });
 
 router.get('/orgdashboard', auth, function(req,res,next){
-    Organization.findOne({email: req.payload.org.email}, function(err, org){
-        
+    Organization.findOne({_id: req.payload._id}, function(err, org){
+
             if(err){return err;}
-            
+
             //get the organization's tasks
             org.populate('tasks', function(err, tasks){
                 if(err){
@@ -107,22 +114,57 @@ router.get('/orgdashboard', auth, function(req,res,next){
 //create a task
 router.post('/tasks', auth, function(req, res, next){
 
-   var task = new Task(req.body); //create a new post with user input info
+   var task = new Task(); //create a new post with user input info
+   task.name = req.body.name;
+   task.description = req.body.description;
+   task.hours = req.body.hours;
    task.organization = req.payload.org;
    task.taken = false;
-   
+
+
+
    task.save(function(err, task){
-      if(err){ 
-          return next(err); 
-      } 
-      Organization.update({email: req.payload.email},{$addToSet:{tasks: task}},function(err, org){
+        if(err){
+            console.log("err1: " + JSON.stringify(err));
+            return err;
+        }
+
+        var taskcomponentsdata = req.body.taskcomponents;
+        for(var i=0; i<taskcomponentsdata.length; i++){
+          taskcomponentsdata[i].task = task._id;
+        }
+
+        TaskComponent.create(req.body.taskcomponents, function(err, tcs){
             if(err){
-                return next(err);
+              console.log("err2: " + JSON.stringify(err));
+              return err;
             }
-            res.json(task);
+
+            task.components = tcs;
+            task.save(function(err, utask){
+
+              if(err){
+                console.log("err3: " + JSON.stringify(err));
+                return err;
+              }
+
+              Organization.update({_id: req.payload._id},{$addToSet:{tasks: utask}},function(err, org){
+                    if(err){
+                      console.log("err3: " + JSON.stringify(err));
+                        return err;
+                    }
+                    res.json(utask);
+              });
+            });
+
+
+
+
+
+        });
+
       });
-   });
-   
+
 });
 
 //edit specific task
@@ -137,12 +179,12 @@ router.put('/tasks/:task/edit', auth, function(req,res,next){
               return err;
           }
           res.json(task);
-          
+
        });
-      
+
    });
-   
-   
+
+
 });
 
 //delete a specific task
@@ -162,7 +204,7 @@ router.delete('/tasks/:task/delete', auth, function(req, res, next){
                     }
                 });
             }
-    }); 
+    });
 });
 
 //edit a task request
@@ -170,7 +212,7 @@ router.put('/taskrequests/:taskrequest/edit', auth, function(req,res,next){
    req.taskrequest.edit(req.body.edits, function(err, taskrequest){
      if(err){
          return next(err);
-     }  
+     }
      res.json(taskrequest);
    });
 });
@@ -188,10 +230,10 @@ router.delete('/taskrequests/:taskrequest/delete', auth, function(req,res,next){
                  res.send(err);
              }else{
                  res.send({});
-             } 
+             }
           });
       }
-   }); 
+   });
 });
 
 //submit a task request
@@ -204,18 +246,20 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
             var tr = new TaskRequest();
             tr.taskid = req.params.task;
             tr.taskname = doc.name;
-            tr.takername = req.body.name;
-            tr.email = req.body.email;
-            tr.school = req.body.school;
+            //tr.takername = req.body.name;
+            //tr.email = req.body.email;
+            //tr.school = req.body.school;
             tr.organization = doc.organization;
+            //tr.phone = req.body.phone;
+            tr.info = req.body.info;
             tr.approved = false;
-            User.findOne({email: req.payload.email}, function(err, user){
+            User.findOne({_id: req.payload._id}, function(err, user){
                 if(err){
                     return next(err);
                 }
-                
+
                 tr.taker = user._id;
-                
+
                 Organization.findById(doc.organization).exec(function(err, orgdoc) {
                     if (err || !orgdoc) {
                         res.statusCode = 404;
@@ -223,21 +267,21 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
                     }else{
                         tr.orgname = orgdoc.name;
                         tr.save(function(err, trequest){
-                            if(err){ 
-                                return next(err); 
-                            } 
-                            User.update({email: req.payload.email},{$addToSet:{taskrequests: trequest}},function(err, user){
+                            if(err){
+                                return next(err);
+                            }
+                            User.update({_id: req.payload._id},{$addToSet:{taskrequests: trequest}},function(err, user){
                                 if(err){
                                     return next(err);
                                 }
-        
+
                                 console.log("trequest: " + JSON.stringify(trequest));
                                 res.json(trequest);
                             });
                         });
                     }
                 });
-            
+
             });
         }
     });
@@ -252,17 +296,17 @@ router.put('/taskrequests/:taskrequest/approve',  function(req,res,next){
      if(err){
          console.log("error approving");
          return next(err);
-     }  
-     
+     }
+
      Task.findOne(req.taskrequest.taskid, function(err, task){
         console.log(task);
         task.setTaken(function(err, takentask){
             console.log("task is now taken");
             res.json(taskrequest);
-        }); 
+        });
      });
      //console.log("approved " + taskrequest);
-     
+
    });
 });
 
@@ -274,7 +318,7 @@ router.get('/taskrequests/:taskrequest/approved', auth, function(req,res,next){
       if(err){
           console.log("error");
           return next(err);
-      } 
+      }
       console.log("isapproved " + taskrequest);
       res.send(taskrequest.approved);
    });
@@ -283,7 +327,7 @@ router.get('/taskrequests/:taskrequest/approved', auth, function(req,res,next){
 //preload tasks
 router.param('task', function(req,res,next,id){
    var query = Task.findById(id); //find the task
-   
+
    // try to get the post details from the Tasks model and attach it to the request object
    query.exec(function(err, task){
       if(err){
@@ -292,16 +336,16 @@ router.param('task', function(req,res,next,id){
       if(!task){
           return next(new Error('Can\'t find task'));
       }
-      
+
       req.task = task;
       return next();
    });
 });
 
-//preload taskrequests
+//preload taskrequest
 router.param('taskrequest', function(req,res,next,id){
     var query = TaskRequest.findById(id); //find the task
-   
+
    // try to get the post details from the Tasks model and attach it to the request object
    query.exec(function(err, taskrequest){
       if(err){
@@ -310,11 +354,11 @@ router.param('taskrequest', function(req,res,next,id){
       if(!taskrequest){
           return next(new Error('Can\'t find task'));
       }
-      
+
       req.taskrequest = taskrequest;
       return next();
    });
-    
+
 });
 
 //retrieve a specific taskrequest
@@ -323,7 +367,18 @@ router.get('/taskrequests/:taskrequest', function(req, res, next){
         if(err){
             return next(err);
         }
-        res.json(tr);
+
+        User.findOne({_id: tr.taker}, function(err, user){
+
+            if(err){return err;}
+            console.log("user: " + JSON.stringify(user));
+            var obj = { taskrequest: tr, applicantdata: user};
+
+            console.log("return data: " + JSON.stringify(obj));
+            res.json(obj);
+        });
+
+
     });
 });
 
@@ -340,8 +395,41 @@ router.get('/tasks/:task', function(req,res,next){
    });
 });
 
-//add a task component
-router.post('/task/:task/addcomponent', auth, function(req,res,next){
+//retrieve taskcomponents of a specific task
+router.get('/tasks/:task/taskcomponents', function(req, res, next){
+
+    TaskComponent.find({task: req.task._id}, function(err, tcs){
+      if(err){
+        return err;
+      }
+
+      res.json(tcs);
+    });
+
+});
+
+//edit a taskcomponent
+router.put('/tasks/:task/taskcomponents/:tcid/edit', function(req, res, next){
+  console.log(req.params.tcid);
+  TaskComponent.findOne({_id: req.params.tcid}, function(err, tc){
+    if(err){
+      return err;
+    }
+
+    console.log(req.body.edits);
+    console.log(tc);
+    tc.edit(req.body.edits, function(err, taskcomponent){
+      if(err){
+        return err;
+      }
+      res.json(taskcomponent);
+    });
+
+  });
+});
+
+//add a task component (NOT USED)
+router.post('/task/:task/taskcomponents/add', auth, function(req,res,next){
     var tc = new TaskComponent();
     tc.task = req.params.task;
     tc.name = req.body.name;
@@ -350,11 +438,11 @@ router.post('/task/:task/addcomponent', auth, function(req,res,next){
     tc.hours = req.body.hours;
     tc.submitted = false;
     tc.completed = false;
-    
+
     tc.save(function(err, taskcomp){
        if(err){
            return next(err);
-       } 
+       }
        return res.json(taskcomp);
     });
 });
@@ -364,16 +452,16 @@ router.post('/register', function(req, res, next){
     console.log("entering register route");
    if(!req.body.email || !req.body.password){
        return res.status(400).json({message: 'Please fill out all fields'});
-   } 
-   
+   }
+
    var user = new User();
-   
+
    user.email = req.body.email;
    user.type = "user";
    user.setPassword(req.body.password);
    user.save(function(err){
        if(err){
-           return next(err); 
+           return next(err);
        }
        return res.json({token: user.generateJWT()});
    });
@@ -381,37 +469,125 @@ router.post('/register', function(req, res, next){
 
 //organization registration
 router.post('/registerorg', function(req, res, next){
-   if(!req.body.email || !req.body.password){
+   if(!req.body.email){
        return res.status(400).json({message: 'Please fill out all fields'});
    }
-   
+
    var org = new Organization();
-   
+
    org.name = req.body.name;
    org.email = req.body.email;
    org.desc = req.body.desc;
    org.city = req.body.city;
    org.country = req.body.country;
+   org.phone = req.body.phone;
+   org.info = req.body.info;
    org.type = "organization";
-   
+
    //generate random temp password
    var randomPass = Math.random().toString(36).slice(-8);
-   
+
    org.setPassword(randomPass);
-   
+
    org.save(function(err){
       if(err){
           return next(err);
       }
-      return res.json({token: org.generateJWT()});
+
+      async.waterfall([
+        function(done) {
+          crypto.randomBytes(20, function(err, buf) {
+              console.log("generate token");
+            var token = buf.toString('hex');
+            done(err, token);
+          });
+        },
+        function(token, done) {
+          Organization.findOne({ email: req.body.email }, function(err, org1) {
+            if (!org) {
+              //req.flash('error', 'No account with that email address exists.');
+              return res.redirect('/registerorg');
+            }
+            console.log("organization found");
+            org1.resetPasswordToken = token;
+            org1.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+            org1.save(function(err) {
+              console.log("organization saved");
+              done(err, token, org1);
+            });
+          });
+        },
+        function(token, org2, done) {
+          /*var smtpTransport = nodemailer.createTransport('SMTP', {
+            service: 'Gmail',
+            auth: {
+              user: emailUser,
+              pass: emailPass
+            }
+          });*/
+          var smtpTransport = nodemailer.createTransport("smtps://pumpkin3500@gmail.com:"+emailPass+"@smtp.gmail.com");
+          var mailOptions = {
+            to: org2.email,
+            from: 'pumpkin3500@gmail.com',
+            subject: 'Node.js Password Reset',
+            text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+              'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+              'http://' + req.headers.host + '/#/createpassword/' + token + '\n\n' +
+              'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+          };
+          smtpTransport.sendMail(mailOptions, function(err) {
+            if(err){
+                console.log("error sending mail: " + JSON.stringify(err));
+            }
+            //req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+            console.log("email sent using " + emailUser + " " + emailPass + " to " + org2.email);
+            //console.log("Message info: " + JSON.stringify(info.response));
+            done(err, 'done');
+          });
+        }
+      ], function(err) {
+        if (err){
+            console.log("error: " + JSON.stringify(err));
+        }
+        console.log("done");
+        return res.json({});
+      });
+
+      //return res.json({});
    });
-   
+
+});
+
+router.get('/createpassword/:token', function(req, res){
+  //res.render('./public/partials/setPass.html');
+  res.send({});
+});
+
+router.post('/setPass/:token', function(req, res){
+   //set the organization's password
+   Organization.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, org) {
+        if (!org) {
+          console.log("Error: " + err);
+          return err;
+        }
+        org.setPassword(req.body.password);
+        org.resetPasswordToken = undefined;
+        org.resetPasswordExpires = undefined;
+
+        org.save(function(err) {
+          if(err){
+           return err;
+          }
+          return res.json({token: org.generateJWT()});
+        });
+     });
 });
 
 //preload user
 router.param('user', function(req,res,next,id){
     var query = User.findById(id); //find the task
-   
+
    // try to get the post details from the Tasks model and attach it to the request object
    query.exec(function(err, user){
       if(err){
@@ -420,11 +596,11 @@ router.param('user', function(req,res,next,id){
       if(!user){
           return next(new Error('Can\'t find task'));
       }
-      
+
       req.user = user;
       return next();
    });
-    
+
 });
 
 //send notification to user
@@ -433,16 +609,16 @@ router.post('/notify/user/:user', auth, function(req,res,next){
     msg.message = req.body.message;
     msg.from_id = req.body.from;
     msg.to_id = req.params.user;
-    
+
     msg.save(function(err, msg){
       if(err){
           return next(err);
       }
-      
+
       res.json(msg);
-      
+
    });
-    
+
 });
 
 //send notification to user
@@ -451,16 +627,16 @@ router.post('/notify/org/:org', auth, function(req,res,next){
     msg.message = req.body.message;
     msg.from_id = req.body.from;
     msg.to_id = req.params.org;
-    
+
     msg.save(function(err, msg){
       if(err){
           return next(err);
       }
-      
+
       res.json(msg);
-      
+
    });
-    
+
 });
 
 //user login
@@ -468,10 +644,10 @@ router.post('/login', function(req,res,next){
    if(!req.body.email || !req.body.password){
        return res.status(400).json({message: 'Please fill out all required fields'});
    }
-   
+
    passport.authenticate('user-local', function(err, user, info){
-       if(err){ 
-           return next(err); 
+       if(err){
+           return next(err);
        }
        console.log(user);
        console.log(info);
@@ -488,7 +664,7 @@ router.post('/loginorg', function(req, res, next){
     if(!req.body.email || !req.body.password){
         return res.status(400).json({message: 'Please fill out all fields'});
     }
-    
+
     passport.authenticate('org-local', function(err, org, info){
         if(err){
             return next(err);
@@ -499,6 +675,74 @@ router.post('/loginorg', function(req, res, next){
             return res.status(401).json(info);
         }
     })(req,res,next);
-})
+});
+
+//edit specific user profile
+router.put('/profile/user/edit', auth, function(req,res,next){
+  console.log("in put profile/edit");
+  console.log("payload: " + JSON.stringify(req.payload.email));
+  console.log("edits: " + JSON.stringify(req.body.edits));
+
+  User.findOne({_id: req.payload._id}, function(err, user){
+
+      if(err){return err;}
+
+      user.edit(req.body.edits, function(err, user2){
+           if(err){
+               console.log("error: " + err);
+               return next(err);
+           }
+
+           res.json(user2);
+       });
+  });
+
+});
+
+//edit org profile
+router.put('/profile/org/edit', auth, function(req,res,next){
+
+  Organization.findOne({_id: req.payload._id}, function(err, org){
+
+      if(err){return err;}
+
+      org.edit(req.body.edits, function(err, org2){
+           if(err){
+               console.log("error: " + err);
+               return next(err);
+           }
+
+           res.json(org2);
+       });
+  });
+
+});
+
+//get a specific user
+router.get('/user/:id', auth, function(req, res, next){
+  User.findOne({_id: req.params.id}, function(err, user){
+     if(err){
+         console.log("error");
+         return next(err);
+     }
+
+     res.json(user);
+  });
+});
+
+//get a specific org using email
+router.get('/org/:id', auth, function(req, res, next){
+  Organization.findOne({_id: req.params.id}, function(err, org){
+     if(err){
+         console.log("error");
+         return next(err);
+     }
+
+     res.json(org);
+  });
+});
+
+
+
 
 module.exports = router;

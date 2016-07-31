@@ -2,13 +2,13 @@
 <div class="page-header">
     <h1>Organization Dashboard</h1>
 </div>
-            
+
 <div ng-show="isLoggedIn()" ng-repeat="task in tasks">
     <span style="font-size:20px; margin-left:10px">
         <span ng-show="task.name">
             <a href="#/tasks/{{task._id}}">{{task.name}}</a>
         </span>
-                    
+
     </span>
 </div>
 
@@ -16,14 +16,14 @@
 <div ng-show="isLoggedIn()" ng-repeat="taskrequest in taskrequests">
     <span style="font-size:20px; margin-left:10px">
         <span ng-show="taskrequest.taskname">
-            <a href="#/taskrequests/{{taskrequest._id}}">{{taskrequest.taskname}} from {{taskrequest.takername}}</a>
+            <a href="#/taskrequests/{{taskrequest._id}}">{{taskrequest.taskname}} request</a>
         </span>
     </span>
 </div>
 
 <form ng-submit="addTask()" ng-show="isLoggedIn()" style="margin-top:30px;">
                 <h3>Add a new Task</h3>
-                        
+
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="Name" ng-model="name"></input>
                 </div>
@@ -33,5 +33,35 @@
                 <div class="form-group">
                     <input type="number" class="form-control" placeholder="Hours" ng-model="hours"></input>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+
+                <button type="submit" class="btn btn-primary">Submit Task</button>
+</form>
+
+<h2>Add task components</h2>
+
+<div ng-repeat="taskcomponent in taskcomponents">
+    <h3 ng-show="taskcomponent.name">Name: {{taskcomponent.name}}</h3>
+    <h3 ng-show="taskcomponent.requirements">Requirements: {{taskcomponent.requirements}}</h3>
+    <h3 ng-show="taskcomponent.due">Due: {{taskcomponent.due}}</h3>
+    <h3 ng-show="taskcomponent.esthours">Estimated completion time (hours): {{taskcomponent.esthours}}</h3>
+    <h3> __________________________________________________________ </h3>
+    <br>
+</div>
+
+<form ng-submit="addTaskComponent()" style="margin-top:30px;">
+  <div class="form-group">
+      <input type="text" class="form-control" placeholder="Name" ng-model="taskc.name"></input>
+  </div>
+  <div class="form-group">
+      <textarea type="text" class="form-control" rows="5"  placeholder="Set the requirements" ng-model="taskc.requirements"></textarea>
+  </div>
+  <div class="form-group">
+      Enter a due date for this component:
+      <input type="date" class="form-control" ng-model="taskc.due"></input>
+  </div>
+  <div class="form-group">
+      <input type="number" class="form-control" placeholder="Estimated hours" ng-model="taskc.esthours"></input>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Create task component</button>
 </form>
