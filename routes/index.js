@@ -408,8 +408,28 @@ router.get('/tasks/:task/taskcomponents', function(req, res, next){
 
 });
 
+//edit a taskcomponent
+router.put('/tasks/:task/taskcomponents/:tcid/edit', function(req, res, next){
+  console.log(req.params.tcid);
+  TaskComponent.findOne({_id: req.params.tcid}, function(err, tc){
+    if(err){
+      return err;
+    }
+
+    console.log(req.body.edits);
+    console.log(tc);
+    tc.edit(req.body.edits, function(err, taskcomponent){
+      if(err){
+        return err;
+      }
+      res.json(taskcomponent);
+    });
+
+  });
+});
+
 //add a task component (NOT USED)
-router.post('/task/:task/addcomponent', auth, function(req,res,next){
+router.post('/task/:task/taskcomponents/add', auth, function(req,res,next){
     var tc = new TaskComponent();
     tc.task = req.params.task;
     tc.name = req.body.name;

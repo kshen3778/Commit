@@ -36,6 +36,14 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
       });
     }
 
+    o.editTaskComponent = function(taskid, tcid, edits){
+      console.log(JSON.stringify(edits));
+      return $http.put('/tasks/' + taskid + '/taskcomponents/' + tcid + '/edit', edits, {
+        //pass JWT token
+        headers: {Authorization: 'Bearer ' + auth.getToken()}
+      });
+    }
+
     //create a task
     o.create  = function(task){
       return $http.post('/tasks', task, {
@@ -456,6 +464,8 @@ function($scope, $state, tasks, task, taskrequests, taskcomponents, auth, accoun
     taskcomponents[i].due = date.toString();
   }
 
+  $scope.tc = {};
+
   $scope.editTask = function(){
         console.log("Task id: " + task[0]._id);
         tasks.editTask(task[0]._id, {
@@ -475,8 +485,22 @@ function($scope, $state, tasks, task, taskrequests, taskcomponents, auth, accoun
 
   };
 
-  $scope.editTaskComponent = function(id){
-
+  $scope.editTaskComponent = function(tcid){
+    tasks.editTaskComponent(task[0]._id, tcid, {
+      edits: {
+        requirements: $scope.tc.requirements,
+        due: $scope.tc.due,
+        esthours: $scope.tc.esthours
+      }
+    }).success(function(data){
+      for(var i = 0; i < taskcomponents.length; i++){
+        if(taskcomponents[i]._id == tcid){
+          $scope.taskcomponents[i].requirements = data.requirements;
+          $scope.taskcomponents[i].due = new Date(data.due + "").toString();
+          $scope.taskcomponents[i].esthours = data.esthours;
+        }
+      }
+    })
   };
 
   $scope.deleteTask = function(){

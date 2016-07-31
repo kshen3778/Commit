@@ -12,4 +12,19 @@ var TaskComponentSchema = new mongoose.Schema({
     ontime: Boolean,
 });
 
+TaskComponentSchema.methods.edit = function(edits,cb){
+
+
+        this.requirements = edits.requirements;
+
+
+        this.due = edits.due;
+
+
+        this.esthours = edits.esthours;
+
+
+        this.save(cb);
+};
+
 mongoose.model('TaskComponent', TaskComponentSchema);

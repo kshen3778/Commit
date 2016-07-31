@@ -31,18 +31,17 @@
                       <h4 ng-show="taskcomponent.esthours">Estimated hours for completion: {{taskcomponent.esthours}}</h4>
                       <form ng-submit="editTaskComponent(taskcomponent._id)" style="margin-top:30px; margin-left:20px; margin-right:20px; margin-bottom: 20px;">
                           <h4>Edit Taskcomponent</h4>
-
                           <div class="form-group">
-                              <textarea type="text" class="form-control" rows="5"  placeholder="Set the requirements" ng-model="taskcomponent.requirements"></textarea>
+                              <textarea type="text" class="form-control" rows="5" ng-init="tc.requirements=taskcomponent.requirements" ng-model="tc.requirements"></textarea>
                           </div>
 
                           <div class="form-group">
                               <h4> Modify Due Date: </h4>
-                              <input type="date" class="form-control" ng-model="taskcomponent.due"></input>
+                              <input type="date" class="form-control" ng-model="tc.due"></input>
                           </div>
 
                           <div class="form-group">
-                              <input type="number" class="form-control" placeholder="Estimated hours for completion" ng-model="taskcomponent.esthours"></input>
+                              <input type="number" class="form-control" placeholder="Estimated hours for completion" ng-init="tc.esthours=taskcomponent.esthours" ng-model="tc.esthours"></input>
                           </div>
                           <button type="submit" class="btn btn-primary">Save Changes</button>
                       </form>
