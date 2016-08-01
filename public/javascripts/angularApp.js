@@ -36,6 +36,7 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
       });
     }
 
+    //edit a taskcomponent
     o.editTaskComponent = function(taskid, tcid, edits){
       console.log(JSON.stringify(edits));
       return $http.put('/tasks/' + taskid + '/taskcomponents/' + tcid + '/edit', edits, {
@@ -43,6 +44,13 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
         headers: {Authorization: 'Bearer ' + auth.getToken()}
       });
     }
+
+    //delete a taskcomponent
+    o.deleteTaskComponent = function(taskid, tcid){
+      return $http.delete('/tasks/' + taskid + '/taskcomponents/' + tcid + '/delete' , {
+        headers: {Authorization: 'Bearer ' + auth.getToken()}
+      });
+    };
 
     //create a task
     o.create  = function(task){
@@ -65,8 +73,6 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
     o.delete = function(task){
       return $http.delete('/tasks/' + task + '/delete' , {
         headers: {Authorization: 'Bearer ' + auth.getToken()}
-      }).success(function(){
-
       });
     };
 
@@ -510,6 +516,16 @@ function($scope, $state, tasks, task, taskrequests, taskcomponents, auth, accoun
       $state.go('orgdashboard');
     });
   };
+
+  $scope.deleteTaskComponent = function(tcid){
+    tasks.deleteTaskComponent(task[0]._id, tcid).then(function(){
+      for(var i = 0; i < taskcomponents.length; i++){
+        if(taskcomponents[i]._id == tcid){
+          $scope.taskcomponents.splice(i, 1);
+        }
+      }
+    });
+  }
 
   $scope.submitRequest = function(){
     taskrequests.submit(task[0]._id, {

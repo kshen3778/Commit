@@ -396,7 +396,7 @@ router.get('/tasks/:task', function(req,res,next){
 });
 
 //retrieve taskcomponents of a specific task
-router.get('/tasks/:task/taskcomponents', function(req, res, next){
+router.get('/tasks/:task/taskcomponents', auth, function(req, res, next){
 
     TaskComponent.find({task: req.task._id}, function(err, tcs){
       if(err){
@@ -409,7 +409,7 @@ router.get('/tasks/:task/taskcomponents', function(req, res, next){
 });
 
 //edit a taskcomponent
-router.put('/tasks/:task/taskcomponents/:tcid/edit', function(req, res, next){
+router.put('/tasks/:task/taskcomponents/:tcid/edit', auth, function(req, res, next){
   console.log(req.params.tcid);
   TaskComponent.findOne({_id: req.params.tcid}, function(err, tc){
     if(err){
@@ -426,6 +426,26 @@ router.put('/tasks/:task/taskcomponents/:tcid/edit', function(req, res, next){
     });
 
   });
+});
+
+//delete a specific taskcomponent
+router.delete('/tasks/:task/taskcomponents/:tcid/delete', auth, function(req, res, next){
+    TaskComponent.findById(req.params.tcid).exec(function(err, doc) {
+            if (err || !doc) {
+                res.statusCode = 404;
+                res.send({});
+            } else {
+                doc.remove(function(err) {
+                    if (err) {
+                        res.statusCode = 403;
+                        res.send(err);
+                    } else {
+                        res.send({});
+
+                    }
+                });
+            }
+    });
 });
 
 //add a task component (NOT USED)
