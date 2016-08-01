@@ -327,9 +327,11 @@ app.controller('MainCtrl', [
         console.log("TaskRequest Factory: " + JSON.stringify(taskrequests.requests));
 
         $scope.taskcomponents = [];
+        $scope.tasknum = 0;
 
         $scope.addTaskComponent = function(){
           var tc = {
+            num: $scope.tasknum,
             name: $scope.taskc.name,
             requirements: $scope.taskc.requirements,
             due: $scope.taskc.due,
@@ -338,12 +340,21 @@ app.controller('MainCtrl', [
 
           $scope.taskcomponents.push(tc);
 
+          $scope.tasknum++;
           $scope.taskc.name = "";
           $scope.taskc.requirements = "";
           $scope.taskc.due = "";
           $scope.taskc.esthours = "";
-          $scope.taskc.taskcomponents = [];
+          //$scope.taskc.taskcomponents = [];
         };
+
+        $scope.removeTaskComponent = function(num){
+          for(var i=0; i<$scope.taskcomponents.length; i++){
+            if($scope.taskcomponents[i].num == num){
+              $scope.taskcomponents.splice(i, 1);
+            }
+          }
+        }
 
         //add a new task
         $scope.addTask = function(){

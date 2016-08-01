@@ -40,12 +40,24 @@
 <h2>Add task components</h2>
 
 <div ng-repeat="taskcomponent in taskcomponents">
-    <h3 ng-show="taskcomponent.name">Name: {{taskcomponent.name}}</h3>
-    <h3 ng-show="taskcomponent.requirements">Requirements: {{taskcomponent.requirements}}</h3>
-    <h3 ng-show="taskcomponent.due">Due: {{taskcomponent.due}}</h3>
-    <h3 ng-show="taskcomponent.esthours">Estimated completion time (hours): {{taskcomponent.esthours}}</h3>
-    <h3> __________________________________________________________ </h3>
-    <br>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">{{taskcomponent.name}}</a>
+      </h4>
+    </div>
+    <div class="panel-collapse collapse in" id="collapse1">
+      <h3 ng-show="taskcomponent.name">Name: {{taskcomponent.name}}</h3>
+      <h3 ng-show="taskcomponent.requirements">Requirements: {{taskcomponent.requirements}}</h3>
+      <h3 ng-show="taskcomponent.due">Due: {{taskcomponent.due}}</h3>
+      <h3 ng-show="taskcomponent.esthours">Estimated completion time (hours): {{taskcomponent.esthours}}</h3>
+      <div style="margin-left:30px; margin-bottom: 30px;">
+        <form ng-submit="removeTaskComponent(taskcomponent.num)">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <form ng-submit="addTaskComponent()" style="margin-top:30px;">
