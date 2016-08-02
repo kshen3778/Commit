@@ -36,6 +36,13 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
       });
     }
 
+    o.createTaskComponent = function(taskid, tc){
+        return $http.post('/tasks/' + taskid + '/taskcomponents/create', tc, {
+          //pass JWT token
+          headers: {Authorization: 'Bearer ' + auth.getToken()}
+        });
+    }
+
     //edit a taskcomponent
     o.editTaskComponent = function(taskid, tcid, edits){
       console.log(JSON.stringify(edits));
@@ -518,6 +525,27 @@ function($scope, $state, tasks, task, taskrequests, taskcomponents, auth, accoun
         }
       }
     })
+  };
+
+  $scope.createTaskComponent = function(){
+
+      var tc = {
+        name: $scope.taskc.name,
+        requirements: $scope.taskc.requirements,
+        due: $scope.taskc.due,
+        esthours: $scope.taskc.esthours
+      };
+      console.log(JSON.stringify(tc));
+      tasks.createTaskComponent(task[0]._id, tc).success(function(data){
+        $scope.taskcomponents.push(data);
+      });
+
+      $scope.tasknum++;
+      $scope.taskc.name = "";
+      $scope.taskc.requirements = "";
+      $scope.taskc.due = "";
+      $scope.taskc.esthours = "";
+
   };
 
   $scope.deleteTask = function(){

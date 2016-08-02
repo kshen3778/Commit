@@ -408,6 +408,25 @@ router.get('/tasks/:task/taskcomponents', auth, function(req, res, next){
 
 });
 
+router.post('/tasks/:task/taskcomponents/create', auth, function(req, res, next){
+        var taskcomponent = new TaskComponent(req.body);
+        taskcomponent.task = req.params.task;
+
+        taskcomponent.save(function(err, tc){
+
+          Task.update({_id: req.params.task._id},{$addToSet:{components: tc}},function(err, t){
+                if(err){
+                  console.log("err: " + JSON.stringify(err));
+                    return err;
+                }
+                res.json(tc);
+          });
+
+        });
+
+
+});
+
 //edit a taskcomponent
 router.put('/tasks/:task/taskcomponents/:tcid/edit', auth, function(req, res, next){
   console.log(req.params.tcid);

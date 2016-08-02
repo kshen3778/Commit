@@ -56,6 +56,25 @@
                   </div>
                 </div>
 
+                <h2>Create task components</h2>
+                <form ng-submit="createTaskComponent()" style="margin-top:30px;">
+                  <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Name" ng-model="taskc.name"></input>
+                  </div>
+                  <div class="form-group">
+                      <textarea type="text" class="form-control" rows="5"  placeholder="Set the requirements" ng-model="taskc.requirements"></textarea>
+                  </div>
+                  <div class="form-group">
+                      Enter a due date for this component:
+                      <input type="date" class="form-control" ng-model="taskc.due"></input>
+                  </div>
+                  <div class="form-group">
+                      <input type="number" class="form-control" placeholder="Estimated hours" ng-model="taskc.esthours"></input>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">Create task component</button>
+                </form>
+
                 <div ng-show="isLoggedIn() && isOrganization()">
                     <form ng-submit="editTask()" ng-show="isLoggedIn()" style="margin-top:30px;">
                         <h3>Edit Task</h3>
