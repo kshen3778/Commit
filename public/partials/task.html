@@ -56,8 +56,9 @@
                   </div>
                 </div>
 
-                <h2>Create task components</h2>
-                <form ng-submit="createTaskComponent()" style="margin-top:30px;">
+
+                <form ng-submit="createTaskComponent()" ng-show="isOrganization()" style="margin-top:30px;">
+                  <h2>Create task components</h2>
                   <div class="form-group">
                       <input type="text" class="form-control" placeholder="Name" ng-model="taskc.name"></input>
                   </div>

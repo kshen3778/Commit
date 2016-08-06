@@ -2,13 +2,13 @@
 <div class="page-header">
     <h1>User Dashboard</h1>
 </div>
-            
+
 <div ng-show="isLoggedIn()" ng-repeat="task in tasks">
     <span style="font-size:20px; margin-left:10px">
         <span ng-show="task.name">
             <a href="#/tasks/{{task._id}}">{{task.name}}</a>
         </span>
-                    
+
     </span>
 </div>
 
@@ -19,7 +19,7 @@
             <a href="#/taskrequests/{{taskrequest._id}}">{{taskrequest.taskname}} by {{taskrequest.orgname}}</a>
             <div ng-show="taskrequest.approved == true">[APPROVED]</div>
         </span>
-                    
+
     </span>
 </div>
 

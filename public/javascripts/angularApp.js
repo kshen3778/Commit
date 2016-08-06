@@ -12,6 +12,7 @@ app.factory('tasks', ['$http', 'auth', function($http, auth){
         //pass JWT token
         headers: {Authorization: 'Bearer ' + auth.getToken()}
       }).success(function(data){
+        console.log("Returning tasks: " + JSON.stringify(data));
         angular.copy(data, o.tasks);
       });
     };

@@ -31,11 +31,12 @@ router.get('/dashboard', auth, function(req,res,next){
 
             if(err){return err;}
 
-            user.populate('tasks', function(err, tasks){
+            user.populate('tasks', function(err, user){
                 if(err){
                     return next(err);
                 }
-                res.json(tasks);
+                console.log("tasks: " + JSON.stringify(user.tasks));
+                res.json(user.tasks);
             });
         });
 
@@ -102,11 +103,11 @@ router.get('/orgdashboard', auth, function(req,res,next){
             if(err){return err;}
 
             //get the organization's tasks
-            org.populate('tasks', function(err, tasks){
+            org.populate('tasks', function(err, org){
                 if(err){
                     return next(err);
                 }
-                res.json(tasks.tasks);
+                res.json(org.tasks);
             });
     });
 });
@@ -292,22 +293,36 @@ router.post('/tasks/:task/submit', auth, function(req, res, next){
 router.put('/taskrequests/:taskrequest/approve',  function(req,res,next){
    console.log(req.params.taskrequest);
    console.log("approve 2");
-   req.taskrequest.approve(function(err, taskrequest){
-     if(err){
-         console.log("error approving");
-         return next(err);
-     }
+   TaskRequest.findOne(req.params.taskrequest._id, function(err, taskrequest){
+     console.log("task request: " + taskrequest);
 
-     Task.findOne(req.taskrequest.taskid, function(err, task){
-        console.log(task);
-        task.setTaken(function(err, takentask){
-            console.log("task is now taken");
-            res.json(taskrequest);
-        });
+     taskrequest.approve(function(err, taskrequest2){
+       if(err){
+           console.log("error approving");
+           return next(err);
+       }
+
+       console.log("task id: " + taskrequest.taskid);
+       Task.findOne(taskrequest.taskid, function(err, task){
+         console.log(task);
+          task.setTaken(function(err, takentask){
+              console.log("task is now taken");
+              console.log(takentask);
+              User.update({_id: taskrequest.taker},{$addToSet:{tasks: taskrequest.taskid}},function(err, user){
+                  if(err){
+                      return next(err);
+                  }
+
+                  res.json(takentask);
+              });
+
+          });
+       });
+       //console.log("approved " + taskrequest);
+
      });
-     //console.log("approved " + taskrequest);
-
    });
+
 });
 
 //is taskrequest approved
