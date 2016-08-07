@@ -515,7 +515,9 @@ function($scope, $state, tasks, task, taskrequests, taskcomponents, auth, accoun
       edits: {
         requirements: $scope.tc.requirements,
         due: $scope.tc.due,
-        esthours: $scope.tc.esthours
+        esthours: $scope.tc.esthours,
+        submission: $scope.tc.submission,
+        acthours: $scope.tc.acthours
       }
     }).success(function(data){
       for(var i = 0; i < taskcomponents.length; i++){

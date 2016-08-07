@@ -18,7 +18,7 @@
                     </span>
                 </h3>
 
-                <div ng-show="isOrganization()" class="panel-group" id="accordion" ng-repeat="taskcomponent in taskcomponents">
+                <div class="panel-group" id="accordion" ng-repeat="taskcomponent in taskcomponents">
                   <div class="panel panel-default">
                     <div class="panel-heading">
                       <h4 class="panel-title">
@@ -29,24 +29,45 @@
                       <h4 ng-show="taskcomponent.requirements">Requirements: {{taskcomponent.requirements}}</h4>
                       <h4 ng-show="taskcomponent.due">Due date: {{taskcomponent.due}}</h4>
                       <h4 ng-show="taskcomponent.esthours">Estimated hours for completion: {{taskcomponent.esthours}}</h4>
+                      <h4 ng-show="taskcomponent.submission">Submission Report: {{taskcomponent.submission}}</h4>
+                      <h4 ng-show="taskcomponent.acthours">Actual recorded hours: {{taskcomponent.acthours}}</h4>
+                      <h4 ng-show="taskcomponent.completed">Completed: {{taskcomponent.completed}}</h4>
                       <form ng-submit="editTaskComponent(taskcomponent._id)" style="margin-top:30px; margin-left:20px; margin-right:20px; margin-bottom: 20px;">
-                          <h4>Edit Taskcomponent</h4>
-                          <div class="form-group">
-                              <textarea type="text" class="form-control" rows="5" ng-init="tc.requirements=taskcomponent.requirements" ng-model="tc.requirements"></textarea>
+                          <div ng-show="isOrganization()">
+                            <h4>Edit Taskcomponent</h4>
+                            <div class="form-group">
+                                <textarea type="text" class="form-control" rows="5" ng-init="tc.requirements=taskcomponent.requirements" ng-model="tc.requirements"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <h4> Modify Due Date: </h4>
+                                <input type="date" class="form-control" ng-model="tc.due"></input>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="number" class="form-control" placeholder="Estimated hours for completion" ng-init="tc.esthours=taskcomponent.esthours" ng-model="tc.esthours"></input>
+                            </div>
                           </div>
 
-                          <div class="form-group">
-                              <h4> Modify Due Date: </h4>
-                              <input type="date" class="form-control" ng-model="tc.due"></input>
-                          </div>
+                          <div ng-show="isUser()">
+                            <h4>Fill in info</h4>
+                            <div class="form-group">
+                                <textarea type="text" class="form-control" rows="5" ng-model="tc.submission"></textarea>
+                            </div>
 
-                          <div class="form-group">
-                              <input type="number" class="form-control" placeholder="Estimated hours for completion" ng-init="tc.esthours=taskcomponent.esthours" ng-model="tc.esthours"></input>
+                            <div class="form-group">
+                                <input type="number" class="form-control" placeholder="Record actual working hours" ng-model="tc.acthours"></input>
+                            </div>
+
+                            <button ng-show="!taskcomponent.completed" ng-click ="toggleCompleted(taskcomponent._id)" type="submit"class="btn btn-primary">Mark as Done</button>
+                            <button ng-show="taskcomponent.completed" ng-click ="toggleCompleted(taskcomponent._id)" type="submit"class="btn btn-danger">Unmark as Done</button>
+
+
                           </div>
                           <button type="submit" class="btn btn-primary">Save Changes</button>
                       </form>
 
-                      <div style="margin-left:30px; margin-bottom: 30px;">
+                      <div ng-show="isOrganization()" style="margin-left:30px; margin-bottom: 30px;">
                         <form ng-submit="deleteTaskComponent(taskcomponent._id)">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
@@ -106,7 +127,7 @@
 
                 </div>
 
-                <div ng-show="isLoggedIn() && isUser()">
+                <div ng-show="isLoggedIn() && isUser() && !task.taken">
                     <!--<a class="btn btn-success" href="#/tasks/{{task._id}}/signUp.html">Request Task</a>-->
                     <h1>Request Task</h1>
                     <div>

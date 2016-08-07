@@ -9,20 +9,27 @@ var TaskComponentSchema = new mongoose.Schema({
     acthours: Number,
     due: Date,
     completed: Boolean,
+    submission: String,
     ontime: Boolean,
 });
 
 TaskComponentSchema.methods.edit = function(edits,cb){
 
-
-        this.requirements = edits.requirements;
-
-
-        this.due = edits.due;
-
-
-        this.esthours = edits.esthours;
-
+        if(edits.requirements != ""){
+          this.requirements = edits.requirements;
+        }
+        if(edits.due != null){
+          this.due = edits.due;
+        }
+        if(edits.esthours != null){
+          this.esthours = edits.esthours;
+        }
+        if(edits.submission != ""){
+          this.submission = edits.submission;
+        }
+        if(edits.acthours != null){
+          this.acthours = edits.acthours;
+        }
 
         this.save(cb);
 };
